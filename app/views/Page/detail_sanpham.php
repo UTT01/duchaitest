@@ -1,33 +1,39 @@
 <?php
+// app/views/Page/detail_sanpham.php
+
 // Hứng dữ liệu từ Controller
 $p = isset($data['product']) ? $data['product'] : null;
 $imgs = isset($data['productImages']) ? $data['productImages'] : [];
-
-
+$baseUrl = "/baitaplon";
 // Kiểm tra nếu không tìm thấy sản phẩm
 if (!$p) {
     echo '<div class="alert alert-danger container mt-5">
-            Sản phẩm không tồn tại! (Mã nhận được: <strong>' . htmlspecialchars($id_sanpham) . '</strong>) 
-            <a href="./">Quay lại</a>
+            Sản phẩm không tồn tại! 
+            <a href="' . $baseUrl . '/Home">Quay lại trang chủ</a>
           </div>';
-    return; // Dừng chạy file
+    return;
 }
 
-// Xử lý ảnh đại diện mặc định nếu null
-$mainAvatar = !empty($p['avatar']) ? $p['avatar'] : 'https://via.placeholder.com/150';
-$mainImg = !empty($p['anh_dai_dien']) ? $p['anh_dai_dien'] : 'https://via.placeholder.com/500';
+// Xử lý ảnh đại diện mặc định
+$mainAvatar = !empty($p['avatar']) ? "/baitaplon/" . $p['avatar'] : 'https://via.placeholder.com/150';
+// Lưu ý: Đường dẫn ảnh giữ nguyên /baitaplon/ nếu thư mục project của bạn tên là baitaplon
+$mainImg = !empty($p['anh_dai_dien']) ? "/baitaplon/" . $p['anh_dai_dien'] : 'https://via.placeholder.com/500';
 ?>
 
 <div class="container mt-5 mb-5">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="http://localhost/baitaplon/Home">Trang chủ</a></li>
             <li class="breadcrumb-item">
-                <a href="/baitaplon/?danhmuc=<?php echo $p['id_danhmuc']; ?>">
+                <a href="/baitaplon/Home">Trang chủ</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="/baitaplon/Home?danhmuc=<?php echo $p['id_danhmuc']; ?>">
                     <?php echo htmlspecialchars($p['ten_danhmuc']); ?>
                 </a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($p['ten_sanpham']); ?></li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <?php echo htmlspecialchars($p['ten_sanpham']); ?>
+            </li>
         </ol>
     </nav>
 
@@ -35,7 +41,7 @@ $mainImg = !empty($p['anh_dai_dien']) ? $p['anh_dai_dien'] : 'https://via.placeh
         <div class="col-md-6 mb-4">
             <div class="card border-0">
                 <div class="main-image-box mb-3 text-center border rounded p-2" style="background: #f8f9fa;">
-                   <img id="mainImage" src="/baitaplon/<?php echo htmlspecialchars($mainImg); ?>"
+                   <img id="mainImage" src="<?php echo htmlspecialchars($mainImg); ?>"
                          class="img-fluid" style="max-height: 400px; object-fit: contain;" alt="Ảnh sản phẩm">
                 </div>
 
@@ -75,14 +81,16 @@ $mainImg = !empty($p['anh_dai_dien']) ? $p['anh_dai_dien'] : 'https://via.placeh
                              class="rounded-circle me-3" width="60" height="60" alt="Avatar người bán">
                         <div>
                         <?php
-    // 1. Tạo link đến trang cá nhân
+                            // 1. Logic tạo link đến trang cá nhân
                             $viewerId = isset($data['user_id']) ? $data['user_id'] : '';
                             $sellerId = $p['id_user']; 
-                            $profileLink = "/baitaplon/User/Profile/" . $sellerId;
                             
-                            // Nếu đang đăng nhập, nối thêm ID người xem để giữ trạng thái đăng nhập
+                            // URL mới: /User/Profile/US001
+                            $profileLink = "/baitaplon/User/Profile/" . urlencode($sellerId);
+                            
+                            // Nếu đang đăng nhập, nối thêm user_id của người xem để giữ session (nếu cần)
                             if (!empty($viewerId)) {
-                                $profileLink .= "/" . $viewerId;
+                                $profileLink .= "/" . urlencode($viewerId);
                             }
                         ?>
 
@@ -121,10 +129,7 @@ $mainImg = !empty($p['anh_dai_dien']) ? $p['anh_dai_dien'] : 'https://via.placeh
                 </div>
                 <div class="card-body">
                     <div class="content-desc">
-                        <?php 
-                            // nl2br giúp chuyển dấu xuống dòng trong database thành thẻ <br>
-                            echo nl2br(htmlspecialchars($p['mota'])); 
-                        ?>
+                        <?php echo nl2br(htmlspecialchars($p['mota'])); ?>
                     </div>
                 </div>
             </div>
@@ -134,24 +139,18 @@ $mainImg = !empty($p['anh_dai_dien']) ? $p['anh_dai_dien'] : 'https://via.placeh
 
 <script>
     function changeImage(element) {
-        // 1. Đổi ảnh lớn thành đường dẫn của ảnh nhỏ vừa click
         document.getElementById('mainImage').src = element.src;
-
-        // 2. Xóa class active ở tất cả ảnh nhỏ
         let thumbs = document.querySelectorAll('.thumb-img');
         thumbs.forEach(img => {
             img.classList.remove('active', 'border-primary');
         });
-
-        // 3. Thêm class active cho ảnh vừa click
         element.classList.add('active', 'border-primary');
     }
 </script>
 
 <style>
-    /* CSS bổ sung để làm đẹp */
     .thumb-img.active {
-        border: 2px solid #0d6efd !important; /* Viền xanh khi được chọn */
+        border: 2px solid #0d6efd !important;
         opacity: 0.7;
     }
     .thumb-img:hover {
@@ -159,8 +158,8 @@ $mainImg = !empty($p['anh_dai_dien']) ? $p['anh_dai_dien'] : 'https://via.placeh
         transition: 0.3s;
     }
     .hover-name:hover {
-    color: #f59e0b !important; /* Màu cam Chợ Tốt */
-    text-decoration: underline !important;
-    cursor: pointer;
-}
+        color: #f59e0b !important;
+        text-decoration: underline !important;
+        cursor: pointer;
+    }
 </style>

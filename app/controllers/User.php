@@ -105,7 +105,7 @@ class User
 
             // Quay lại trang profile của chính mình
             // Dùng urlencode để đảm bảo link đúng
-            header("Location: index.php?controller=user&action=profile&id=" . urlencode($id_user));
+            header("Location: /baitaplon/User/Profile/" . urlencode($id_user));
             exit();
         }
     }

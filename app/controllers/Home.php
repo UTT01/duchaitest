@@ -12,8 +12,15 @@ class Home
         $this->conn = $conn;
     }
 
-    public function Get_data($user_id = null)
+    public function index($user_id = null)
     {
+        // Xử lý logout nếu có
+        if (isset($_GET['logout']) && $_GET['logout'] == '1') {
+            session_destroy();
+            header("Location: /baitaplon/Home");
+            exit();
+        }
+        
         // 2. Khởi tạo Model trực tiếp với $this->conn
         $sanphamModel = new SanphamModel($this->conn);
 

@@ -139,24 +139,26 @@
 <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
     <div class="container">
         <?php
-        // 1. Xử lý logic đường dẫn chung cho cả Logo và Form tìm kiếm
+        // 1. Xử lý logic đường dẫn
         $currentUserId = isset($data['user_id']) ? $data['user_id'] : '';
-        
-        // Đường dẫn gốc
-        $baseUrl = "http://localhost/baitaplon/Home";
-        
-        // Nếu đã đăng nhập (có user_id), nối thêm vào URL để giữ trạng thái đăng nhập
-        $actionUrl = $baseUrl;
+
+        // Định nghĩa thư mục gốc dự án (nếu bạn đổi tên folder thì sửa ở đây)
+        $projectRoot = "/baitaplon";
+
         if (!empty($currentUserId)) {
-            $actionUrl .= "/Get_data/" . $currentUserId;
+            // Nếu ĐÃ ĐĂNG NHẬP: về /baitaplon/Home/
+            $actionUrl = $projectRoot . "/Home/index/" . urlencode($currentUserId);
+        } else {
+            // Nếu CHƯA ĐĂNG NHẬP: về /baitaplon/Home/
+            $actionUrl = $projectRoot . "/Home/";
         }
         ?>
 
-        <a class="navbar-brand" href="<?php echo htmlspecialchars($actionUrl); ?>">
+        <a class="navbar-brand" href="/baitaplon/Home">
             Chợ Tốt Clone
         </a>
 
-        <form class="d-flex flex-grow-1 mx-3 search-bar align-items-center gap-2" method="GET" action="<?php echo htmlspecialchars($actionUrl); ?>">
+        <form class="d-flex flex-grow-1 mx-3 search-bar align-items-center gap-2" method="GET" action="/baitaplon/Home">
             <?php
             $keyword  = isset($data['keyword']) ? $data['keyword'] : '';
             $category = isset($data['category']) ? $data['category'] : '';
@@ -195,26 +197,26 @@
 
         <div class="d-flex align-items-center gap-3">
             <?php if (isset($data['isLoggedIn']) && $data['isLoggedIn']): ?>
-                <a href="?url=Sanpham/DangTin" class="btn btn-warning fw-bold text-dark">
+                <a href="/baitaplon/Home" class="btn btn-warning fw-bold text-dark">
                     <i class="bi bi-pencil-square"></i> Đăng tin
                 </a>
 
-                <a href="?url=Chat" class="text-secondary position-relative text-decoration-none" title="Tin nhắn">
+                <a href="/baitaplon/Home" class="text-secondary position-relative text-decoration-none" title="Tin nhắn">
                     <i class="bi bi-chat-dots-fill" style="font-size: 1.5rem;"></i>
                     <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
                 </a>
 
-                <a href="?url=User/Profile/<?php echo htmlspecialchars($currentUserId); ?>" class="text-secondary text-decoration-none" title="Tài khoản cá nhân">
+                <a href="/baitaplon/User/Profile/<?php echo htmlspecialchars($currentUserId); ?>" class="text-secondary text-decoration-none" title="Tài khoản cá nhân">
                     <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                 </a>
 
-                <a href="?url=Auth/Logout" class="text-muted small text-decoration-none" style="font-size: 0.8rem;">
+                <a href="/baitaplon/Home?logout=1" class="text-muted small text-decoration-none" style="font-size: 0.8rem;">
                     Đăng xuất
                 </a>
 
             <?php else: ?>
-                <a href="/baitaplon/Login/Get_data/" class="btn btn-outline-secondary me-2">Đăng nhập</a>
-                <a href="/baitaplon/Auth/Register" class="btn btn-warning">Đăng ký</a>
+                <a href="/baitaplon/Login" class="btn btn-outline-secondary me-2">Đăng nhập</a>
+                <a href="/baitaplon/Login" class="btn btn-warning">Đăng ký</a>
             <?php endif; ?>
         </div>
     </div>
@@ -223,15 +225,19 @@
 <!-- Nội dung chính -->
 <div class="container my-4">
     <?php
-    if (isset($data["page"]) && $data["page"]) {
-        if (file_exists("./MVC/Views/Page/".$data["page"].".php")) {
-            require_once "./MVC/Views/Page/".$data["page"].".php";
+        if (isset($data["page"]) && $data["page"]) {
+            // Sửa thành đường dẫn tương đối theo thư mục hiện tại (__DIR__)
+            // __DIR__ là app/views, nối thêm /Page/ là đúng
+            $pageFile = __DIR__ . "/Page/" . $data["page"] . ".php";
+            
+            if (file_exists($pageFile)) {
+                require_once $pageFile;
+            } else {
+                echo '<div class="alert alert-danger">Không tìm thấy page: ' . htmlspecialchars($data["page"]) . ' (Path: ' . $pageFile . ')</div>';
+            }
         } else {
-            echo '<div class="alert alert-danger">Không tìm thấy page: ' . htmlspecialchars($data["page"]) . '</div>';
+            echo '<div class="alert alert-warning">Không có trang nào được chọn!</div>';
         }
-    } else {
-        echo '<div class="alert alert-warning">Không có trang nào được chọn!</div>';
-    }
     ?>
 </div>
 

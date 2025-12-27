@@ -37,7 +37,7 @@ class Login {
         }
     }
     
-    public function Get_data(){
+    public function index(){
         $data = [];
         $this->view('login_view', $data);
     }
@@ -65,7 +65,7 @@ class Login {
                 if ($user) {
                     // Đăng nhập thành công - redirect đến Home
                     $id_user = $user['id_user'];
-                    header("Location: index.php?controller=home&action=index&user_id=" . urlencode($id_user));
+                    header("Location: /baitaplon/Home?user_id=" . urlencode($id_user));
                     exit();
                 } else {
                     $error = 'Tên đăng nhập hoặc mật khẩu không đúng!';
@@ -73,7 +73,7 @@ class Login {
             }
         } else {
             // Nếu không phải POST request, redirect về trang đăng nhập
-            header("Location: index.php?controller=login&action=index");
+            header("Location: /baitaplon/Login");
             exit();
         }
         

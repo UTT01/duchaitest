@@ -1,5 +1,6 @@
 <?php
-// Hứng dữ liệu từ Controller User
+// app/views/Page/profile.php
+
 $u = isset($data['profile']) ? $data['profile'] : null;
 $products = isset($data['products']) ? $data['products'] : [];
 $isOwner = isset($data['isOwner']) ? $data['isOwner'] : false;
@@ -63,18 +64,20 @@ if (!$u) {
                         <div class="col-sm-6 col-lg-4">
                             <div class="card h-100 product-card shadow-sm">
                                 <?php
-                                $img = isset($p['anh_hienthi']) ? $p['anh_hienthi'] : 'https://via.placeholder.com/300';
-                                // Tạo link chi tiết sản phẩm kèm theo ID đăng nhập để không bị logout
+                                $img = isset($p['anh_hienthi']) ? "/baitaplon/" . $p['anh_hienthi'] : 'https://via.placeholder.com/300';
+                                
+                                // === SỬA ĐƯỜNG DẪN CHI TIẾT ===
                                 $detailLink = "index.php?controller=home&action=detail&id=" . urlencode($p['id_sanpham']);
                                 if (!empty($loggedInId)) {
                                     $detailLink .= "&user_id=" . urlencode($loggedInId);
                                 }
                                 ?>
-                                <img src="/baitaplon/<?php echo htmlspecialchars($img); ?>" class="card-img-top" style="height: 150px; object-fit: cover;">
+                                <img src="<?php echo htmlspecialchars($img); ?>" class="card-img-top" style="height: 150px; object-fit: cover;">
                                 <div class="card-body p-2 d-flex flex-column">
                                     <h6 class="card-title text-truncate"><?php echo htmlspecialchars($p['ten_sanpham']); ?></h6>
                                     <p class="text-danger fw-bold mb-1"><?php echo number_format($p['gia']); ?> đ</p>
                                     <p class="text-muted small mb-1"><?php echo htmlspecialchars($p['ngaydang']); ?></p>
+                                    
                                     <a href="<?php echo htmlspecialchars($detailLink); ?>" class="btn btn-sm btn-outline-primary mt-auto stretched-link">Xem chi tiết</a>
                                 </div>
                             </div>
@@ -89,7 +92,7 @@ if (!$u) {
 <?php if ($isOwner): ?>
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-        <form action="/baitaplon/User/Update" method="POST" enctype="multipart/form-data">
+        <form action="index.php?controller=user&action=update" method="POST" enctype="multipart/form-data">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold">Chỉnh sửa thông tin</h5>
