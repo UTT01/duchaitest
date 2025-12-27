@@ -5,18 +5,30 @@
 $p = isset($data['product']) ? $data['product'] : null;
 $imgs = isset($data['productImages']) ? $data['productImages'] : [];
 $baseUrl = "/baitaplon";
+
+// Lấy ID người xem (để xử lý link Home và link Chat)
+$viewerId = isset($data['user_id']) ? $data['user_id'] : '';
+
+// === [SỬA LẠI LINK HOME] ===
+// Mặc định về trang chủ không đăng nhập
+$homeLink = "/baitaplon/Home";
+// Nếu đang đăng nhập thì thêm /index/MA_NV
+if (!empty($viewerId)) {
+    $homeLink .= "/index/" . urlencode($viewerId);
+}
+// ===========================
+
 // Kiểm tra nếu không tìm thấy sản phẩm
 if (!$p) {
     echo '<div class="alert alert-danger container mt-5">
             Sản phẩm không tồn tại! 
-            <a href="' . $baseUrl . '/Home">Quay lại trang chủ</a>
+            <a href="' . htmlspecialchars($homeLink) . '">Quay lại trang chủ</a>
           </div>';
     return;
 }
 
 // Xử lý ảnh đại diện mặc định
 $mainAvatar = !empty($p['avatar']) ? "/baitaplon/" . $p['avatar'] : 'https://via.placeholder.com/150';
-// Lưu ý: Đường dẫn ảnh giữ nguyên /baitaplon/ nếu thư mục project của bạn tên là baitaplon
 $mainImg = !empty($p['anh_dai_dien']) ? "/baitaplon/" . $p['anh_dai_dien'] : 'https://via.placeholder.com/500';
 ?>
 
@@ -24,10 +36,11 @@ $mainImg = !empty($p['anh_dai_dien']) ? "/baitaplon/" . $p['anh_dai_dien'] : 'ht
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
-                <a href="/baitaplon/Home">Trang chủ</a>
+                <a href="<?php echo htmlspecialchars($homeLink); ?>">Trang chủ</a>
             </li>
+            
             <li class="breadcrumb-item">
-                <a href="/baitaplon/Home?danhmuc=<?php echo $p['id_danhmuc']; ?>">
+                <a href="/baitaplon/Home?danhmuc=<?php echo $p['id_danhmuc']; ?><?php echo !empty($viewerId) ? '&user_id='.$viewerId : ''; ?>">
                     <?php echo htmlspecialchars($p['ten_danhmuc']); ?>
                 </a>
             </li>
@@ -106,15 +119,29 @@ $mainImg = !empty($p['anh_dai_dien']) ? "/baitaplon/" . $p['anh_dai_dien'] : 'ht
                     </div>
                     
                     <div class="d-grid gap-2">
-                        <a href="tel:<?php echo htmlspecialchars($p['sdt']); ?>" class="btn btn-success fw-bold">
-                            <i class="bi bi-telephone-fill"></i> GỌI NGAY: <?php echo htmlspecialchars($p['sdt']); ?>
-                        </a>
+            <a href="tel:<?php echo htmlspecialchars($p['sdt']); ?>" class="btn btn-success fw-bold">
+                <i class="bi bi-telephone-fill"></i> GỌI NGAY: <?php echo htmlspecialchars($p['sdt']); ?>
+            </a>
 
+                <?php 
+                // Kiểm tra đăng nhập từ dữ liệu controller truyền sang
+                $isLoggedIn = !empty($data['isLoggedIn']); 
+                
+                // Nếu đã đăng nhập -> Link vào Controller Chat/start
+                // Nếu chưa đăng nhập -> Link vào Controller Login
+                $chatLink = $isLoggedIn 
+                    ? "/baitaplon/Chat/start/" . $p['id_user'] 
+                    : "/baitaplon/Login";
+                    
+                $onclickInfo = $isLoggedIn ? "" : "return confirm('Bạn cần đăng nhập để bắt đầu trò chuyện. Chuyển đến trang đăng nhập?');";
+                ?>
 
-                        <a href="/baitaplon/Chat/start/<?php echo $p['id_user']; ?>" class="btn btn-outline-primary">
-                            <i class="bi bi-chat-dots-fill"></i> Chat với người bán
-                        </a>
-                    </div>
+                <a href="<?php echo $chatLink; ?>" 
+                class="btn btn-outline-primary"
+                onclick="<?php echo $onclickInfo; ?>">
+                    <i class="bi bi-chat-dots-fill"></i> Chat với người bán
+                </a>
+            </div>
                 </div>
             </div>
 

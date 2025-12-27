@@ -13,50 +13,63 @@ class Chat {
     }
 
     // URL: /baitaplon/Chat/index
-    public function index($conversation_id = 0) {
-        // Kiểm tra đăng nhập
-        if (!isset($_GET['user_id']) && !isset($_SESSION['user_id'])) {
-             // Nếu chưa đăng nhập thì đá về login
+    public function index($partner_id = 0, $url_user_id = '') {
+        // 1. Kiểm tra đăng nhập (Ưu tiên Session, nếu không có thì lấy trên URL)
+        if (!isset($_SESSION['user_id']) && empty($url_user_id)) {
              header("Location: /baitaplon/Login");
              exit();
         }
         
-        // Lấy ID người đang đăng nhập (Ưu tiên Session)
-        $my_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : $_GET['user_id'];
+        $my_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : $url_user_id;
         
-        // 1. Load danh sách chat
+        // 2. Load danh sách các cuộc trò chuyện bên trái
         $conversations = $this->chatModel->loadConversations($my_id);
         
-        // 2. Xác định conversation đang mở
-        $active_conversation_id = (int)$conversation_id;
-        if ($active_conversation_id == 0) {
+        // 3. Xử lý logic chọn cuộc hội thoại active
+        $active_conversation_id = 0;
+        
+        // Nếu trên URL chưa có ID đối phương (vào trang chat lần đầu)
+        if ($partner_id == 0 || $partner_id === '0') {
+            // Lấy cuộc trò chuyện gần nhất
             $latest = $this->chatModel->getLatestConversation($my_id);
-            $active_conversation_id = $latest['id_conversation'] ?? 0;
+            if ($latest) {
+                $active_conversation_id = $latest['id_conversation'];
+                // Tìm ID đối phương để cập nhật lại biến $partner_id (cho view hiển thị đúng)
+                $partner_id = $this->chatModel->getOtherUserId($active_conversation_id, $my_id);
+            }
+        } else {
+            // Nếu đã có ID đối phương trên URL -> Tìm ID hội thoại
+            $active_conversation_id = $this->chatModel->findConversation($my_id, $partner_id);
+            
+            // Nếu chưa có hội thoại thì tạo mới luôn (để tránh lỗi)
+            if ($active_conversation_id == 0) {
+                $active_conversation_id = $this->chatModel->createConversation($my_id, $partner_id);
+            }
         }
 
-        // 3. Lấy dữ liệu tin nhắn
-        $sender_id = 0; 
+        // 4. Lấy dữ liệu tin nhắn
+        $sender_id = 0; // Đây chính là partner_id (người gửi tin cho mình xem)
         $sender_name = '';
         $messages = [];
 
         if ($active_conversation_id > 0) {
+            // Đảm bảo partner_id đúng với conversation đang mở
             $sender_id = $this->chatModel->getOtherUserId($active_conversation_id, $my_id);
             $sender_name = $this->chatModel->getNameSenderByID($sender_id);
             $messages = $this->chatModel->loadMessage($my_id, $sender_id);
         }
 
-        // Truyền dữ liệu sang View
+        // 5. Truyền dữ liệu sang View
         $data = [
             'conversations' => $conversations,
             'active_conversation_id' => $active_conversation_id,
             'messages' => $messages,
             'sender_name' => $sender_name,
-            'sender_id' => $sender_id, // <--- THÊM DÒNG NÀY
-            'my_id' => $my_id
+            'sender_id' => $sender_id, // ID người mình đang chat cùng
+            'my_id' => $my_id          // ID của mình
         ];
         
         require_once __DIR__ . '/../views/chat_view.php';
-        
     }
 
     // Chức năng bắt đầu chat từ trang sản phẩm
@@ -73,30 +86,41 @@ class Chat {
             return;
         }
 
-        // Tìm hoặc tạo cuộc hội thoại
-        $conversation_id = $this->chatModel->findConversation($my_id, $seller_id);
-        if($conversation_id == 0) {
-            $conversation_id = $this->chatModel->createConversation($my_id, $seller_id);
-        }
-
-        // Chuyển hướng vào trang chat với ID hội thoại đó
-        header("Location: /baitaplon/Chat/index/" . $conversation_id);
+        // Thay vì chuyển hướng đến ID hội thoại, ta chuyển hướng đến format URL mới:
+        // /Chat/index/NGUOI_BAN/TOI
+        header("Location: /baitaplon/Chat/index/" . $seller_id . "/" . $my_id);
         exit();
     }
-
     // Gửi tin nhắn
     public function send() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $my_id = $_SESSION['user_id'];
-            $to_user_id = $_POST['to_user_id']; // Cần thêm input hidden này ở View
-            $content = trim($_POST['message']);
+            // 1. Lấy ID người gửi (mình)
+            $my_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '';
             
-            if (!empty($content)) {
-                $con_id = $this->chatModel->insertMessage($my_id, $to_user_id, $content);
-                header("Location: /baitaplon/Chat/index/" . $con_id);
+            // Nếu session bị mất hoặc không có, thử lấy từ post (nếu bạn có input hidden my_id) 
+            // hoặc redirect về login
+            if(empty($my_id)) {
+                header("Location: /baitaplon/Login");
+                exit();
+            }
+
+            // 2. Lấy dữ liệu từ Form
+            $to_user_id = isset($_POST['to_user_id']) ? $_POST['to_user_id'] : '';
+            $content = isset($_POST['message']) ? trim($_POST['message']) : '';
+            
+            if (!empty($content) && !empty($to_user_id)) {
+                // 3. Gọi Model để lưu tin nhắn
+                // Hàm này trả về conversation_id nhưng ta không dùng để redirect nữa
+                $this->chatModel->insertMessage($my_id, $to_user_id, $content);
+
+                // 4. [QUAN TRỌNG] Redirect về đúng URL định dạng mới:
+                // /Chat/index/NGUOI_KIA/MINH
+                header("Location: /baitaplon/Chat/index/" . $to_user_id . "/" . $my_id);
                 exit();
             }
         }
+        
+        // Trường hợp lỗi hoặc không post, về trang chủ chat
         header("Location: /baitaplon/Chat");
     }
     public function search() {

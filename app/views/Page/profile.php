@@ -60,29 +60,34 @@ if (!$u) {
                 <div class="alert alert-info">Người dùng này chưa đăng sản phẩm nào.</div>
             <?php else: ?>
                 <div class="row g-3">
-                    <?php foreach ($products as $p): ?>
-                        <div class="col-sm-6 col-lg-4">
-                            <div class="card h-100 product-card shadow-sm">
-                                <?php
-                                $img = isset($p['anh_hienthi']) ? "/baitaplon/" . $p['anh_hienthi'] : 'https://via.placeholder.com/300';
-                                
-                                // === SỬA ĐƯỜNG DẪN CHI TIẾT ===
-                                $detailLink = "index.php?controller=home&action=detail&id=" . urlencode($p['id_sanpham']);
-                                if (!empty($loggedInId)) {
-                                    $detailLink .= "&user_id=" . urlencode($loggedInId);
-                                }
-                                ?>
-                                <img src="<?php echo htmlspecialchars($img); ?>" class="card-img-top" style="height: 150px; object-fit: cover;">
-                                <div class="card-body p-2 d-flex flex-column">
-                                    <h6 class="card-title text-truncate"><?php echo htmlspecialchars($p['ten_sanpham']); ?></h6>
-                                    <p class="text-danger fw-bold mb-1"><?php echo number_format($p['gia']); ?> đ</p>
-                                    <p class="text-muted small mb-1"><?php echo htmlspecialchars($p['ngaydang']); ?></p>
-                                    
-                                    <a href="<?php echo htmlspecialchars($detailLink); ?>" class="btn btn-sm btn-outline-primary mt-auto stretched-link">Xem chi tiết</a>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+                <?php foreach ($products as $p): ?>
+    <div class="col-sm-6 col-lg-4">
+        <div class="card h-100 product-card shadow-sm">
+            <?php
+            $img = isset($p['anh_hienthi']) ? "/baitaplon/" . $p['anh_hienthi'] : 'https://via.placeholder.com/300';
+            
+            // === SỬA LẠI ĐƯỜNG DẪN CHI TIẾT (QUAN TRỌNG) ===
+            // Sử dụng format: /baitaplon/Home/detail_Sanpham/ID_SP/ID_NGUOI_XEM
+            
+            $detailLink = "/baitaplon/Home/detail_Sanpham/" . $p['id_sanpham'];
+            
+            // Nếu người xem đang đăng nhập ($loggedInId lấy từ đầu file profile.php), nối thêm vào link
+            if (!empty($loggedInId)) {
+                $detailLink .= "/" . urlencode($loggedInId);
+            }
+            ?>
+            
+            <img src="<?php echo htmlspecialchars($img); ?>" class="card-img-top" style="height: 150px; object-fit: cover;">
+            <div class="card-body p-2 d-flex flex-column">
+                <h6 class="card-title text-truncate"><?php echo htmlspecialchars($p['ten_sanpham']); ?></h6>
+                <p class="text-danger fw-bold mb-1"><?php echo number_format($p['gia']); ?> đ</p>
+                <p class="text-muted small mb-1"><?php echo htmlspecialchars($p['ngaydang']); ?></p>
+                
+                <a href="<?php echo htmlspecialchars($detailLink); ?>" class="btn btn-sm btn-outline-primary mt-auto stretched-link">Xem chi tiết</a>
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>    
                 </div>
             <?php endif; ?>
         </div>
@@ -92,7 +97,7 @@ if (!$u) {
 <?php if ($isOwner): ?>
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-        <form action="index.php?controller=user&action=update" method="POST" enctype="multipart/form-data">
+        <form action="/baitaplon/User/Update" method="POST" enctype="multipart/form-data">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold">Chỉnh sửa thông tin</h5>
