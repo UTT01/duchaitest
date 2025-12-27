@@ -128,7 +128,7 @@
                 </div>
             <?php endif; ?>
 
-            <form method="POST" action="/baitaplon/Login/processLogin">
+            <form method="POST" action="index.php?controller=login&action=process">
                 <div class="form-group">
                     <label for="username" class="form-label">
                         <i class="bi bi-person"></i> Tên đăng nhập
@@ -170,7 +170,7 @@
             </form>
 
             <div class="back-link">
-                <a href="/baitaplon/Home">
+                <a href="index.php?controller=home&action=index">
                     <i class="bi bi-arrow-left"></i> Quay lại trang chủ
                 </a>
             </div>

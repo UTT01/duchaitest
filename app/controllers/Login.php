@@ -1,5 +1,47 @@
 <?php 
-class Login extends controller{
+class Login {
+    protected $conn;
+    
+    public function __construct($conn)
+    {
+        $this->conn = $conn;
+    }
+    
+    /**
+     * Load model
+     */
+    protected function model($modelName)
+    {
+        // Đảm bảo BaseClasses đã được load
+        if (!class_exists('connectDB')) {
+            require_once __DIR__ . '/../config/BaseClasses.php';
+        }
+        
+        $modelFile = __DIR__ . '/../models/' . $modelName . '.php';
+        if (file_exists($modelFile)) {
+            require_once $modelFile;
+            $model = new $modelName($this->conn);
+            return $model;
+        } else {
+            die("Model $modelName không tồn tại!");
+        }
+    }
+    
+    /**
+     * Load view
+     */
+    protected function view($viewName, $data = [])
+    {
+        $viewFile = __DIR__ . '/../views/' . $viewName . '.php';
+        if (file_exists($viewFile)) {
+            // Extract data array thành các biến
+            extract($data);
+            require_once $viewFile;
+        } else {
+            die("View $viewName không tồn tại!");
+        }
+    }
+    
     public function Get_data(){
         $data = [];
         $this->view('login_view', $data);
@@ -26,9 +68,9 @@ class Login extends controller{
                 $user = $userModel->authenticate($username, $password);
                 
                 if ($user) {
-                    // Đăng nhập thành công - redirect đến Home/Get_data/id_user
+                    // Đăng nhập thành công - redirect đến Home
                     $id_user = $user['id_user'];
-                    header("Location: /baitaplon/Home/Get_data/" . urlencode($id_user));
+                    header("Location: index.php?controller=home&action=index&user_id=" . urlencode($id_user));
                     exit();
                 } else {
                     $error = 'Tên đăng nhập hoặc mật khẩu không đúng!';
@@ -36,7 +78,7 @@ class Login extends controller{
             }
         } else {
             // Nếu không phải POST request, redirect về trang đăng nhập
-            header("Location: /baitaplon/Login/Get_data");
+            header("Location: index.php?controller=login&action=index");
             exit();
         }
         

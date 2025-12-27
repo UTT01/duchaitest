@@ -1,5 +1,6 @@
 <?php
-class Home extends controller
+require_once __DIR__ . '/../models/SanphamModel.php';
+class Home
 {
     public function Get_data($user_id = null)
     {

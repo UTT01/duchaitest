@@ -65,9 +65,9 @@ if (!$u) {
                                 <?php
                                 $img = isset($p['anh_hienthi']) ? $p['anh_hienthi'] : 'https://via.placeholder.com/300';
                                 // Tạo link chi tiết sản phẩm kèm theo ID đăng nhập để không bị logout
-                                $detailLink = "/baitaplon/Home/detail_Sanpham/" . $p['id_sanpham'];
+                                $detailLink = "index.php?controller=home&action=detail&id=" . urlencode($p['id_sanpham']);
                                 if (!empty($loggedInId)) {
-                                    $detailLink .= "/" . $loggedInId;
+                                    $detailLink .= "&user_id=" . urlencode($loggedInId);
                                 }
                                 ?>
                                 <img src="/baitaplon/<?php echo htmlspecialchars($img); ?>" class="card-img-top" style="height: 150px; object-fit: cover;">

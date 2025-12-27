@@ -8,7 +8,6 @@ $page          = isset($data['page']) ? $data['page'] : 1;
 $totalPages    = isset($data['totalPages']) ? $data['totalPages'] : 1;
 $totalProducts = isset($data['totalProducts']) ? $data['totalProducts'] : 0;
 
-// Hàm build URL phân trang, giữ lại q, danhmuc & diachi
 if (!function_exists('buildHomeUrl')) {
     function buildHomeUrl($page, $keyword, $category, $address) {
         $params = [];

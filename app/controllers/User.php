@@ -1,8 +1,50 @@
 <?php
-class User extends controller
+class User
 {
+    protected $conn;
+    
+    public function __construct($conn)
+    {
+        $this->conn = $conn;
+    }
+    
+    /**
+     * Load model
+     */
+    protected function model($modelName)
+    {
+        // Đảm bảo BaseClasses đã được load
+        if (!class_exists('connectDB')) {
+            require_once __DIR__ . '/../config/BaseClasses.php';
+        }
+        
+        $modelFile = __DIR__ . '/../models/' . $modelName . '.php';
+        if (file_exists($modelFile)) {
+            require_once $modelFile;
+            $model = new $modelName($this->conn);
+            return $model;
+        } else {
+            die("Model $modelName không tồn tại!");
+        }
+    }
+    
+    /**
+     * Load view
+     */
+    protected function view($viewName, $data = [])
+    {
+        $viewFile = __DIR__ . '/../views/' . $viewName . '.php';
+        if (file_exists($viewFile)) {
+            // Extract data array thành các biến
+            extract($data);
+            require_once $viewFile;
+        } else {
+            die("View $viewName không tồn tại!");
+        }
+    }
+    
     // Hiển thị trang Profile
-    // URL: /baitaplon/User/Profile/US001
+    // URL: index.php?controller=user&action=profile&id=US001
     public function Profile($profileId, $loggedInId = '')
     {
         $userModel = $this->model('UserModel');
@@ -68,7 +110,7 @@ class User extends controller
 
             // Quay lại trang profile của chính mình
             // Dùng urlencode để đảm bảo link đúng
-            header("Location: /baitaplon/User/Profile/" . $id_user);
+            header("Location: index.php?controller=user&action=profile&id=" . urlencode($id_user));
             exit();
         }
     }
