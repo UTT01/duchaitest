@@ -76,30 +76,31 @@ $mainImg = !empty($p['anh_dai_dien']) ? "/baitaplon/" . $p['anh_dai_dien'] : 'ht
 
             <div class="card bg-light mb-4 border-0 shadow-sm">
                 <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <img src="<?php echo htmlspecialchars($mainAvatar); ?>" 
-                             class="rounded-circle me-3" width="60" height="60" alt="Avatar người bán">
-                        <div>
-                        <?php
-                            // 1. Logic tạo link đến trang cá nhân
-                            $viewerId = isset($data['user_id']) ? $data['user_id'] : '';
-                            $sellerId = $p['id_user']; 
-                            
-                            // URL mới: /User/Profile/US001
-                            $profileLink = "/baitaplon/User/Profile/" . urlencode($sellerId);
-                            
-                            // Nếu đang đăng nhập, nối thêm user_id của người xem để giữ session (nếu cần)
-                            if (!empty($viewerId)) {
-                                $profileLink .= "/" . urlencode($viewerId);
-                            }
-                        ?>
+                <div class="d-flex align-items-center mb-3">
+    <img src="<?php echo htmlspecialchars($mainAvatar); ?>" class="rounded-circle me-3" width="60" height="60" alt="Avatar">
+    <div>
+    <?php
+        // === SỬA LOGIC LINK PROFILE ===
+        // $data['user_id'] là ID của người đang xem (đang đăng nhập)
+        $viewerId = isset($data['user_id']) ? $data['user_id'] : '';
+        
+        // $p['id_user'] là ID của người bán
+        $sellerId = $p['id_user']; 
+        
+        // Format chuẩn: /baitaplon/User/Profile/ID_NGUOI_BAN/ID_NGUOI_XEM
+        $profileLink = "/baitaplon/User/Profile/" . urlencode($sellerId);
+        
+        if (!empty($viewerId)) {
+            $profileLink .= "/" . urlencode($viewerId);
+        }
+    ?>
 
-                        <h6 class="mb-0 fw-bold text-uppercase">
-                            Người bán: 
-                            <a href="<?php echo htmlspecialchars($profileLink); ?>" class="text-decoration-none text-dark hover-name">
-                                <?php echo htmlspecialchars($p['hoten']); ?>
-                            </a>
-                        </h6>
+    <h6 class="mb-0 fw-bold text-uppercase">
+        Người bán: 
+        <a href="<?php echo htmlspecialchars($profileLink); ?>" class="text-decoration-none text-dark hover-name">
+            <?php echo htmlspecialchars($p['hoten']); ?>
+        </a>
+    </h6>
                             <small class="text-muted"><i class="bi bi-geo-alt-fill"></i> <?php echo htmlspecialchars($p['khu_vuc_ban']); ?></small>
                         </div>
                     </div>

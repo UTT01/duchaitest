@@ -139,26 +139,27 @@
 <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
     <div class="container">
         <?php
-        // 1. Xử lý logic đường dẫn
+        // 1. Lấy ID người dùng hiện tại
         $currentUserId = isset($data['user_id']) ? $data['user_id'] : '';
-
-        // Định nghĩa thư mục gốc dự án (nếu bạn đổi tên folder thì sửa ở đây)
-        $projectRoot = "/baitaplon";
-
+        
+        // 2. Tạo Link Logo (Về trang chủ)
+        // Nếu có ID -> Về /Home/index/ID, ngược lại về /Home
+        $homeLink = "/baitaplon/Home";
         if (!empty($currentUserId)) {
-            // Nếu ĐÃ ĐĂNG NHẬP: về /baitaplon/Home/
-            $actionUrl = $projectRoot . "/Home/index/" . urlencode($currentUserId);
-        } else {
-            // Nếu CHƯA ĐĂNG NHẬP: về /baitaplon/Home/
-            $actionUrl = $projectRoot . "/Home/";
+            $homeLink .= "/index/" . urlencode($currentUserId);
         }
         ?>
 
-        <a class="navbar-brand" href="/baitaplon/Home">
+        <a class="navbar-brand" href="<?php echo $homeLink; ?>">
             Chợ Tốt Clone
         </a>
 
-        <form class="d-flex flex-grow-1 mx-3 search-bar align-items-center gap-2" method="GET" action="/baitaplon/Home">
+        <form class="d-flex flex-grow-1 mx-3 search-bar align-items-center gap-2" method="GET" action="/baitaplon/Home/index">
+            
+            <?php if(!empty($currentUserId)): ?>
+                <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($currentUserId); ?>">
+            <?php endif; ?>
+
             <?php
             $keyword  = isset($data['keyword']) ? $data['keyword'] : '';
             $category = isset($data['category']) ? $data['category'] : '';
@@ -169,50 +170,34 @@
             <select class="form-select" name="danhmuc" onchange="this.form.submit()">
                 <option value="">Tất cả danh mục</option>
                 <?php foreach ($categories as $cat): ?>
-                    <option
-                        value="<?php echo htmlspecialchars($cat['id_danhmuc']); ?>"
-                        <?php echo ($category === $cat['id_danhmuc']) ? 'selected' : ''; ?>
-                    >
+                    <option value="<?php echo htmlspecialchars($cat['id_danhmuc']); ?>"
+                        <?php echo ($category === $cat['id_danhmuc']) ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($cat['ten_danhmuc']); ?>
                     </option>
                 <?php endforeach; ?>
             </select>
             
-            <input
-                class="form-control"
-                type="text"
-                name="q"
-                placeholder="Tìm kiếm sản phẩm, từ khóa..."
-                value="<?php echo htmlspecialchars($keyword); ?>"
-            >
-            <input
-                class="form-control"
-                type="text"
-                name="diachi"
-                placeholder="Tìm theo khu vực / địa chỉ"
-                value="<?php echo htmlspecialchars($address); ?>"
-            >
+            <input class="form-control" type="text" name="q" placeholder="Tìm kiếm..." value="<?php echo htmlspecialchars($keyword); ?>">
+            <input class="form-control" type="text" name="diachi" placeholder="Khu vực..." value="<?php echo htmlspecialchars($address); ?>">
             <button class="btn btn-warning btn-search" type="submit">Tìm kiếm</button>
         </form>
 
         <div class="d-flex align-items-center gap-3">
             <?php if (isset($data['isLoggedIn']) && $data['isLoggedIn']): ?>
-                <a href="/baitaplon/Home" class="btn btn-warning fw-bold text-dark">
+                <a href="<?php echo $homeLink; ?>" class="btn btn-warning fw-bold text-dark">
                     <i class="bi bi-pencil-square"></i> Đăng tin
                 </a>
 
-                <a href="/baitaplon/Home" class="text-secondary position-relative text-decoration-none" title="Tin nhắn">
+                <a href="<?php echo $homeLink; ?>" class="text-secondary position-relative text-decoration-none">
                     <i class="bi bi-chat-dots-fill" style="font-size: 1.5rem;"></i>
                     <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
                 </a>
 
-                <a href="/baitaplon/User/Profile/<?php echo htmlspecialchars($currentUserId); ?>" class="text-secondary text-decoration-none" title="Tài khoản cá nhân">
+                <a href="/baitaplon/User/Profile/<?php echo urlencode($currentUserId); ?>" class="text-secondary text-decoration-none" title="Trang cá nhân">
                     <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
                 </a>
 
-                <a href="/baitaplon/Home?logout=1" class="text-muted small text-decoration-none" style="font-size: 0.8rem;">
-                    Đăng xuất
-                </a>
+                <a href="/baitaplon/Home?logout=1" class="text-muted small text-decoration-none">Đăng xuất</a>
 
             <?php else: ?>
                 <a href="/baitaplon/Login" class="btn btn-outline-secondary me-2">Đăng nhập</a>
