@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Chat Realtime</title>
-    <link rel="stylesheet" href="public/css/chat.css">
+    <link rel="stylesheet" href="/baitaplon/public/css/chat.css">
 </head>
 <body>
 
@@ -13,7 +13,7 @@
 <div class="chat-list">
 
     <!-- 🔍 SEARCH -->
-        <form method="post" action="index.php?action=search">
+        <form method="post" action="/baitaplon/Chat/search">
             <div class="chat-search">
                 <input 
                     type="text" 

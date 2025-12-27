@@ -51,11 +51,12 @@ class Chat {
             'active_conversation_id' => $active_conversation_id,
             'messages' => $messages,
             'sender_name' => $sender_name,
+            'sender_id' => $sender_id, // <--- THÊM DÒNG NÀY
             'my_id' => $my_id
         ];
         
-        // Gọi View (Lưu ý đường dẫn view của dự án chính)
         require_once __DIR__ . '/../views/chat_view.php';
+        
     }
 
     // Chức năng bắt đầu chat từ trang sản phẩm
@@ -97,6 +98,82 @@ class Chat {
             }
         }
         header("Location: /baitaplon/Chat");
+    }
+    public function search() {
+        // Kiểm tra đăng nhập
+        if (!isset($_SESSION['user_id'])) {
+             header("Location: /baitaplon/Login");
+             exit();
+        }
+
+        $my_id = $_SESSION['user_id'];
+        $keyword = isset($_POST['keyword']) ? trim($_POST['keyword']) : '';
+
+        // 1. Gọi Model để tìm kiếm
+        if ($keyword !== '') {
+            // Tìm theo tên người gửi
+            $conversations = $this->chatModel->searchConversationBySenderName($my_id, $keyword);
+        } else {
+            // Nếu không nhập gì thì load danh sách mặc định
+            $conversations = $this->chatModel->loadConversations($my_id);
+        }
+
+        // 2. Các logic hiển thị giao diện (giống hệt hàm index)
+        $active_conversation_id = isset($_GET['conversation_id']) ? (int)$_GET['conversation_id'] : 0;
+        if ($active_conversation_id == 0) {
+            $latest = $this->chatModel->getLatestConversation($my_id);
+            $active_conversation_id = $latest['id_conversation'] ?? 0;
+        }
+
+        $sender_id = 0; 
+        $sender_name = ''; 
+        $messages = [];
+
+        if ($active_conversation_id > 0) {
+            $sender_id = $this->chatModel->getOtherUserId($active_conversation_id, $my_id);
+            $sender_name = $this->chatModel->getNameSenderByID($sender_id);
+            $messages = $this->chatModel->loadMessage($my_id, $sender_id);
+        }
+
+        // 3. Truyền dữ liệu sang View
+        $data = [
+            'conversations' => $conversations,
+            'active_conversation_id' => $active_conversation_id,
+            'messages' => $messages,
+            'sender_name' => $sender_name,
+            'sender_id' => $sender_id,
+            'my_id' => $my_id,
+            // Truyền lại từ khóa để giữ trên ô input sau khi tìm
+            'keyword' => $keyword 
+        ];
+        
+        require_once __DIR__ . '/../views/chat_view.php';
+    }
+
+    public function edit_msg() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $my_id = $_SESSION['user_id'];
+            $message_id = isset($_POST['message_id']) ? (int)$_POST['message_id'] : 0;
+            $content = isset($_POST['message']) ? trim($_POST['message']) : '';
+
+            if ($message_id > 0 && !empty($content)) {
+                $this->chatModel->updateMessage($message_id, $my_id, $content);
+            }
+            // Quay lại trang trước (hoặc trang index chat)
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+        }
+    }
+
+    public function delete_msg() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $my_id = $_SESSION['user_id'];
+            $message_id = isset($_POST['message_id']) ? (int)$_POST['message_id'] : 0;
+
+            if ($message_id > 0) {
+                $this->chatModel->deleteMessage($message_id, $my_id);
+            }
+            header("Location: " . $_SERVER['HTTP_REFERER']);
+        }
     }
 }
 ?>
