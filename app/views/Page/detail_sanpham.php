@@ -109,9 +109,11 @@ $mainImg = !empty($p['anh_dai_dien']) ? "/baitaplon/" . $p['anh_dai_dien'] : 'ht
                         <a href="tel:<?php echo htmlspecialchars($p['sdt']); ?>" class="btn btn-success fw-bold">
                             <i class="bi bi-telephone-fill"></i> GỌI NGAY: <?php echo htmlspecialchars($p['sdt']); ?>
                         </a>
-                        <button class="btn btn-outline-primary">
+
+
+                        <a href="/baitaplon/Chat/start/<?php echo $p['id_user']; ?>" class="btn btn-outline-primary">
                             <i class="bi bi-chat-dots-fill"></i> Chat với người bán
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>

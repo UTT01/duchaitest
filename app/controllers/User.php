@@ -88,7 +88,7 @@ class User
             // Xử lý upload ảnh
             $avatarUrl = null;
             if (isset($_FILES['avatar_file']) && $_FILES['avatar_file']['error'] == 0) {
-                $target_dir = "Public/images/";
+                $target_dir = "public/images/";
                 if (!file_exists($target_dir)) mkdir($target_dir, 0777, true);
                 
                 $fileName = time() . "_" . basename($_FILES["avatar_file"]["name"]);

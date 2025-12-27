@@ -63,7 +63,11 @@ class Login {
                 $user = $userModel->authenticate($username, $password);
                 
                 if ($user) {
-                    // Đăng nhập thành công - redirect đến Home
+                    // 1. Lưu ID vào Session (QUAN TRỌNG NHẤT)
+                    $_SESSION['user_id'] = $user['id_user'];
+                    $_SESSION['username'] = $user['username']; // Lưu thêm tên nếu cần
+                
+                    // 2. Redirect về Home (Giữ nguyên user_id trên URL để code cũ vẫn chạy)
                     $id_user = $user['id_user'];
                     header("Location: /baitaplon/Home?user_id=" . urlencode($id_user));
                     exit();
