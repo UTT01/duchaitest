@@ -1,4 +1,6 @@
 <?php
+// 1. Load Model thủ công vì chưa có autoload
+require_once __DIR__ . '/../models/CategoriesModel.php';
 
 class CategoriesController {
     private $categoriesModel;
@@ -16,12 +18,16 @@ class CategoriesController {
         }
     }
 
-    public function getSubCategories() {
+    // 2. SỬA: Thêm tham số $id_parent vào hàm để nhận từ URL (do index.php truyền vào)
+    // Ví dụ URL: /Categories/getSubCategories/dienthoai -> $id_parent = 'dienthoai'
+    public function getSubCategories($id_parent = null) {
         header('Content-Type: application/json; charset=utf-8');
         try {
-            $id_parent = $_GET['id_parent'] ?? null;
-            if ($id_parent) {
-                echo json_encode($this->categoriesModel->getSubCategories($id_parent));
+            // Ưu tiên lấy từ tham số truyền vào (URL path), nếu không có thì thử lấy từ $_GET (query string)
+            $id = $id_parent ?? ($_GET['id_parent'] ?? null);
+
+            if ($id) {
+                echo json_encode($this->categoriesModel->getSubCategories($id));
             } else {
                 echo json_encode([]);
             }
@@ -30,6 +36,7 @@ class CategoriesController {
         }
     }
 
+    // Hàm này giữ nguyên vì bên JS gọi kiểu ?id_danhmuc=... (Query String) nên $_GET vẫn bắt được
     public function getAttributes() {
         header('Content-Type: application/json; charset=utf-8');
         try {

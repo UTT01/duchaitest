@@ -30,94 +30,92 @@ class PostController {
         }
 
         public function add() {
+            // 1. Đảm bảo không có khoảng trắng thừa trước khi in JSON
+            ob_clean(); 
             header('Content-Type: application/json; charset=utf-8');
             
             try {
-                $this->conn->beginTransaction();
+                // SỬA LỖI 1: Dùng hàm đúng của MySQLi
+                $this->conn->begin_transaction();
 
                 if (empty($_POST['title']) || empty($_POST['price']) || empty($_POST['catLevel2'])) {
                     throw new Exception("Vui lòng nhập đầy đủ: Tiêu đề, Giá, Danh mục");
                 }
 
-                // SỬA: Ưu tiên lấy ID từ form (do URL truyền vào), nếu không có thì lấy session
                 if (isset($_POST['id_user_posted']) && !empty($_POST['id_user_posted'])) {
                     $id_user = $_POST['id_user_posted'];
                 } else {
                     $id_user = $_SESSION['user_id'] ?? 1;
                 }
 
-            $ten_sanpham = trim($_POST['title']);
-            $id_danhmuc = intval($_POST['catLevel2']);
-            $gia = floatval($_POST['price']);
-            $mota = trim($_POST['description'] ?? '');
-            $address = trim($_POST['address'] ?? '');
+                $ten_sanpham = trim($_POST['title']);
+                $id_danhmuc = trim($_POST['catLevel2']);
+                $gia = floatval($_POST['price']);
+                $mota = trim($_POST['description'] ?? '');
+                $address = trim($_POST['address'] ?? '');
 
-            // 2. Xử lý Upload ảnh trước để lấy danh sách tên file
-            $uploadedImages = [];
-            if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
-                foreach ($_FILES['images']['name'] as $key => $val) {
-                    // Gọi hàm upload, nhận về tên file (ví dụ: abc.jpg)
-                    $fileName = $this->uploadImage($_FILES['images'], $key);
-                    if ($fileName) {
-                        $uploadedImages[] = $this->dbPublicPath . $fileName;
+                // Xử lý Upload ảnh
+                $uploadedImages = [];
+                if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
+                    foreach ($_FILES['images']['name'] as $key => $val) {
+                        $fileName = $this->uploadImage($_FILES['images'], $key);
+                        if ($fileName) {
+                            $uploadedImages[] = $this->dbPublicPath . $fileName;
+                        }
                     }
                 }
-            }
 
-            // Lấy ảnh đầu tiên làm Avatar, nếu không có thì dùng mặc định
-            $avatar = count($uploadedImages) > 0 ? $uploadedImages[0] : 'public/images/default.jpg';
+                $avatar = count($uploadedImages) > 0 ? $uploadedImages[0] : 'public/images/default.jpg';
 
-            // 3. Insert Sản phẩm
-            $id_sanpham = $this->postModel->insertProduct($ten_sanpham, $id_danhmuc, $id_user, $gia, $mota, $avatar, $address);
+                // Insert Sản phẩm
+                $id_sanpham = $this->postModel->insertProduct($ten_sanpham, $id_danhmuc, $id_user, $gia, $mota, $avatar, $address);
 
-            if (!$id_sanpham) {
-                throw new Exception("Lỗi khi tạo sản phẩm vào Database");
-            }
+                if (!$id_sanpham) {
+                    // Lấy lỗi trực tiếp từ biến kết nối $this->conn
+                    throw new Exception("Chi tiết lỗi DB: " . mysqli_error($this->conn));
+                }
 
-            // 4. Insert Album ảnh (Chi tiết ảnh)
-            // Lưu ý: Đã upload ở bước 2, giờ chỉ việc lưu đường dẫn vào DB
-            foreach ($uploadedImages as $imgUrl) {
-                $this->postModel->insertProductImage($id_sanpham, $imgUrl);
-            }
+                // Insert Album ảnh
+                foreach ($uploadedImages as $imgUrl) {
+                    $this->postModel->insertProductImage($id_sanpham, $imgUrl);
+                }
 
-            // 5. Insert Thuộc tính
-            if (isset($_POST['thuoctinh']) && is_array($_POST['thuoctinh'])) {
-                foreach ($_POST['thuoctinh'] as $id_thuoctinh => $giatri) {
-                    $val = trim($giatri);
-                    if ($val !== '') {
-                        $this->postModel->insertAttributeValue($id_sanpham, intval($id_thuoctinh), $val);
+                // Insert Thuộc tính
+                if (isset($_POST['thuoctinh']) && is_array($_POST['thuoctinh'])) {
+                    foreach ($_POST['thuoctinh'] as $id_thuoctinh => $giatri) {
+                        $val = trim($giatri);
+                        if ($val !== '') {
+                            $this->postModel->insertAttributeValue($id_sanpham, intval($id_thuoctinh), $val);
+                        }
                     }
                 }
+
+                // SỬA LỖI: Commit transaction
+                $this->conn->commit();
+
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Đăng tin thành công!',
+                    'id_sanpham' => $id_sanpham,
+                    'redirect' => 'index.php?controller=product&action=detail&id=' . $id_sanpham
+                ]);
+
+            } catch (Exception $e) {
+                // SỬA LỖI 2: Rollback thẳng, không kiểm tra inTransaction() vì MySQLi không có hàm đó
+                try {
+                    $this->conn->rollback();
+                } catch (Exception $ex) {
+                    // Bỏ qua lỗi rollback nếu chưa start transaction
+                }
+
+                http_response_code(400);
+                echo json_encode([
+                    'success' => false,
+                    'error' => $e->getMessage()
+                ]);
             }
-
-            // --- COMMIT TRANSACTION ---
-            // Mọi thứ thành công, lưu chính thức vào DB
-            $this->conn->commit();
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'Đăng tin thành công!',
-                'id_sanpham' => $id_sanpham,
-                'redirect' => 'index.php?controller=product&action=detail&id=' . $id_sanpham
-            ]);
-
-        } catch (Exception $e) {
-            // --- ROLLBACK ---
-            // Nếu có lỗi, hoàn tác mọi thay đổi trong DB
-            if ($this->conn->inTransaction()) {
-                $this->conn->rollBack();
-            }
-
-            // (Tùy chọn) Có thể xóa các file ảnh vừa upload nếu DB lỗi để tránh rác server
-            // Code xóa ảnh ở đây...
-
-            http_response_code(400);
-            echo json_encode([
-                'success' => false,
-                'error' => $e->getMessage()
-            ]);
+            exit; // Dừng code ngay lập tức để tránh in thêm ký tự thừa
         }
-    }
 
     // Hàm chỉ trả về Tên file, việc ghép đường dẫn để controller lo
     private function uploadImage($files, $index) {

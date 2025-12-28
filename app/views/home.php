@@ -453,7 +453,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Fetch API cần sửa đường dẫn nếu đang ở URL cấp 2 (/index/id)
     // Cách tốt nhất là dùng đường dẫn gốc /baitaplon/...
-    const apiUrl = '/baitaplon/Categories'; 
+    const apiUrl = '/baitaplon/CategoriesController'; 
 
 // Lấy danh mục cha
     fetch(apiUrl + '/getParentCategories')
@@ -587,7 +587,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const formData = new FormData(form);
             selectedFiles.forEach((file) => { formData.append('images[]', file); });
 
-            fetch(baseUrl + '?controller=post&action=add', {
+            fetch('/baitaplon/PostController/add', {
                 method: 'POST',
                 body: formData
             })
