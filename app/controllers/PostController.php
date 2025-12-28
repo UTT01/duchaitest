@@ -49,7 +49,7 @@ class PostController {
                 }
 
                 $ten_sanpham = trim($_POST['title']);
-                $id_danhmuc = trim($_POST['catLevel2']);
+                $id_danhmuc = intval($_POST['catLevel2']);
                 $gia = floatval($_POST['price']);
                 $mota = trim($_POST['description'] ?? '');
                 $address = trim($_POST['address'] ?? '');

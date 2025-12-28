@@ -12,7 +12,6 @@ class PostModel
     public function insertProduct($ten_sanpham, $id_danhmuc, $id_user, $gia, $mota, $anh_dai_dien, $khu_vuc_ban)
     {
         // Escape dữ liệu đầu vào
-        $id_sanpham = 'SP_' . uniqid();
         $ten_sanpham = mysqli_real_escape_string($this->con, $ten_sanpham);
         $id_danhmuc = mysqli_real_escape_string($this->con, $id_danhmuc);
         $id_user = mysqli_real_escape_string($this->con, $id_user);
@@ -23,8 +22,8 @@ class PostModel
         $khu_vuc_ban = mysqli_real_escape_string($this->con, $khu_vuc_ban);
 
         // SỬA: Thêm cột khu_vuc_ban vào câu lệnh SQL
-        $sql = "INSERT INTO sanpham (id_sanpham,ten_sanpham, id_danhmuc, id_user, gia, mota, anh_dai_dien, khu_vuc_ban, ngaydang, trangthai) 
-                VALUES ('$id_sanpham','$ten_sanpham', '$id_danhmuc', '$id_user', '$gia', '$mota', '$anh_dai_dien', '$khu_vuc_ban', NOW(), 'Chờ duyệt')";
+        $sql = "INSERT INTO sanpham (ten_sanpham, id_danhmuc, id_user, gia, mota, anh_dai_dien, khu_vuc_ban, ngaydang, trangthai) 
+                VALUES ('$ten_sanpham', '$id_danhmuc', '$id_user', '$gia', '$mota', '$anh_dai_dien', '$khu_vuc_ban', NOW(), 'Chờ duyệt')";
 
         $result = mysqli_query($this->con, $sql);
 

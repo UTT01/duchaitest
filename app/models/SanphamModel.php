@@ -30,7 +30,7 @@ class SanphamModel
         $address = mysqli_real_escape_string($this->con, trim($address));
         $userId = mysqli_real_escape_string($this->con, trim($userId)); // Thêm escape cho an toàn
 
-        $where = " WHERE 1 ";
+        $where = " WHERE 1 AND sp.trangthai = N'Đã duyệt'";
         if ($keyword !== '') $where .= " AND sp.ten_sanpham LIKE '%$keyword%'";
         if ($category !== '') $where .= " AND sp.id_danhmuc = '$category'";
         if ($address !== '')  $where .= " AND sp.khu_vuc_ban LIKE '%$address%'";
@@ -52,17 +52,16 @@ class SanphamModel
         $address = mysqli_real_escape_string($this->con, trim($address));
         $userId = mysqli_real_escape_string($this->con, trim($userId));
 
-        $where = " WHERE 1 ";
+        $where = " WHERE 1 AND sp.trangthai = N'Đã duyệt'";
         if ($keyword !== '') $where .= " AND sp.ten_sanpham LIKE '%$keyword%'";
         if ($category !== '') {
             $where .= " AND (sp.id_danhmuc = '$category' OR sp.id_danhmuc IN (SELECT id_danhmuc FROM danhmuc WHERE id_parent = '$category'))";
         }
         if ($address !== '') $where .= " AND sp.khu_vuc_ban LIKE '%$address%'";
-        // Bổ sung logic lọc theo User ID nếu có
         if ($userId !== '')  $where .= " AND sp.id_user = '$userId' ";
 
-        $sql = "SELECT sp.id_sanpham, sp.ten_sanpham, sp.gia, sp.mota, sp.anh_dai_dien, sp.khu_vuc_ban, sp.ngaydang, sp.trangthai, dm.ten_danhmuc, 
-                COALESCE(MIN(spa.url_anh), sp.anh_dai_dien) AS anh_hienthi
+        $sql = "SELECT sp.id_sanpham, sp.ten_sanpham, sp.gia, sp.mota, sp.avatar, sp.khu_vuc_ban, sp.ngaydang, sp.trangthai, dm.ten_danhmuc, 
+                COALESCE(MIN(spa.url_anh), sp.avatar) AS anh_hienthi
                 FROM sanpham sp
                 LEFT JOIN danhmuc dm ON sp.id_danhmuc = dm.id_danhmuc
                 LEFT JOIN sanpham_anh spa ON sp.id_sanpham = spa.id_sanpham
@@ -83,7 +82,7 @@ class SanphamModel
     public function getProductById($id)
     {
         $id = mysqli_real_escape_string($this->con, $id);
-        $sql = "SELECT s.*, u.hoten, u.sdt, u.avatar, d.ten_danhmuc 
+        $sql = "SELECT s.*, u.hoten, u.sdt, u.avatar AS avatar_user, d.ten_danhmuc 
                 FROM sanpham s
                 JOIN users u ON s.id_user = u.id_user
                 JOIN danhmuc d ON s.id_danhmuc = d.id_danhmuc
