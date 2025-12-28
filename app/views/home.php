@@ -305,7 +305,7 @@
                     <i class="bi bi-pencil-square"></i> Đăng tin
                 </button>
 
-                <a href="<?php echo $homeLink; ?>" class="text-secondary position-relative text-decoration-none">
+                <a href="/baitaplon/Chat/index/0/<?php echo $currentUserId; ?>" class="text-secondary position-relative text-decoration-none" title="Tin nhắn">
                     <i class="bi bi-chat-dots-fill" style="font-size: 1.5rem;"></i>
                     <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
                 </a>

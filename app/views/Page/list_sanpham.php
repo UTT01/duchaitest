@@ -4,7 +4,7 @@ $products      = isset($data['products']) ? $data['products'] : [];
 $keyword       = isset($data['keyword']) ? $data['keyword'] : '';
 $category      = isset($data['category']) ? $data['category'] : '';
 $address       = isset($data['address']) ? $data['address'] : '';
-$page          = isset($data['page']) ? $data['page'] : 1;
+$page          = isset($data['pageNum']) ? $data['pageNum'] : 1;
 $totalPages    = isset($data['totalPages']) ? $data['totalPages'] : 1;
 $totalProducts = isset($data['totalProducts']) ? $data['totalProducts'] : 0;
 
