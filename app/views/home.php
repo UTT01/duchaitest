@@ -453,12 +453,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Fetch API cần sửa đường dẫn nếu đang ở URL cấp 2 (/index/id)
     // Cách tốt nhất là dùng đường dẫn gốc /baitaplon/...
-    const baseUrl = '/baitaplon/index.php'; // Hoặc đường dẫn gốc của bạn
+    const apiUrl = '/baitaplon/Categories'; 
 
-    // Lấy danh mục cha
-    fetch(baseUrl + '?controller=categories&action=getParentCategories')
-        .then(res => res.json())
-        .then(data => {
+// Lấy danh mục cha
+    fetch(apiUrl + '/getParentCategories')
+            .then(res => res.json())
+            .then(data => {
             if(data.error) return;
             data.forEach(item => {
                 const opt = document.createElement('option');
@@ -474,7 +474,7 @@ document.addEventListener("DOMContentLoaded", function() {
         groupCat2.style.display = 'none';
         dynamicDiv.innerHTML = '';
         if (!idParent) return;
-        fetch(baseUrl + `?controller=categories&action=getSubCategories&id_parent=${idParent}`)
+        fetch(apiUrl + `/getSubCategories/${idParent}`)
             .then(res => res.json())
             .then(data => {
                 if (data.length > 0) {
@@ -493,7 +493,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const idDanhmuc = this.value;
         dynamicDiv.innerHTML = '';
         if (!idDanhmuc) return;
-        fetch(baseUrl + `?controller=categories&action=getAttributes&id_danhmuc=${idDanhmuc}`)
+        fetch(apiUrl + `/getAttributes?id_danhmuc=${idDanhmuc}`)
             .then(res => res.json())
             .then(attributes => {
                 attributes.forEach(attr => {
