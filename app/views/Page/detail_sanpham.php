@@ -28,7 +28,7 @@ if (!$p) {
 }
 
 // Xử lý ảnh đại diện mặc định
-$mainAvatar = !empty($p['avatar']) ? "/baitaplon/" . $p['avatar'] : 'https://via.placeholder.com/150';
+$mainAvatar = !empty($p['avatar_user']) ? "/baitaplon/" . $p['avatar_user'] : 'https://via.placeholder.com/150';
 $mainImg = !empty($p['anh_dai_dien']) ? "/baitaplon/" . $p['anh_dai_dien'] : 'https://via.placeholder.com/500';
 ?>
 
@@ -59,16 +59,11 @@ $mainImg = !empty($p['anh_dai_dien']) ? "/baitaplon/" . $p['anh_dai_dien'] : 'ht
                 </div>
 
                 <div class="d-flex overflow-auto gap-2">
-                    <img src="<?php echo htmlspecialchars($mainImg); ?>" 
-                         class="img-thumbnail thumb-img active" 
-                         style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;" 
-                         onclick="changeImage(this)">
-                    
-                    <?php foreach ($imgs as $img): ?>
-                       <img src="/baitaplon/<?php echo htmlspecialchars($img['url_anh']); ?>"
-                             class="img-thumbnail thumb-img" 
-                             style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;" 
-                             onclick="changeImage(this)">
+                    <?php foreach ($imgs as $index => $img): ?>
+                        <img src="/baitaplon/<?php echo htmlspecialchars($img['url_anh']); ?>"
+                            class="img-thumbnail thumb-img <?php echo ($index === 0) ? 'active' : ''; ?>" 
+                            style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;" 
+                            onclick="changeImage(this)">
                     <?php endforeach; ?>
                 </div>
             </div>
