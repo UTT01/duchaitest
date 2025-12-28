@@ -9,7 +9,7 @@ class PostModel
     }
 
     // Insert sản phẩm
-    public function insertProduct($ten_sanpham, $id_danhmuc, $id_user, $gia, $mota, $anh_dai_dien)
+    public function insertProduct($ten_sanpham, $id_danhmuc, $id_user, $gia, $mota, $anh_dai_dien, $khu_vuc_ban)
     {
         // Escape dữ liệu đầu vào
         $ten_sanpham = mysqli_real_escape_string($this->con, $ten_sanpham);
@@ -18,17 +18,18 @@ class PostModel
         $gia = mysqli_real_escape_string($this->con, $gia);
         $mota = mysqli_real_escape_string($this->con, $mota);
         $anh_dai_dien = mysqli_real_escape_string($this->con, $anh_dai_dien);
+        // Escape địa chỉ
+        $khu_vuc_ban = mysqli_real_escape_string($this->con, $khu_vuc_ban);
 
-        // Lưu ý: Đã đổi 'avatar' thành 'anh_dai_dien' để khớp với DB duchaitest
-        $sql = "INSERT INTO sanpham (ten_sanpham, id_danhmuc, id_user, gia, mota, anh_dai_dien, ngaydang, trangthai) 
-                VALUES ('$ten_sanpham', '$id_danhmuc', '$id_user', '$gia', '$mota', '$anh_dai_dien', NOW(), 'Chờ duyệt')";
+        // SỬA: Thêm cột khu_vuc_ban vào câu lệnh SQL
+        $sql = "INSERT INTO sanpham (ten_sanpham, id_danhmuc, id_user, gia, mota, anh_dai_dien, khu_vuc_ban, ngaydang, trangthai) 
+                VALUES ('$ten_sanpham', '$id_danhmuc', '$id_user', '$gia', '$mota', '$anh_dai_dien', '$khu_vuc_ban', NOW(), 'Chờ duyệt')";
 
         $result = mysqli_query($this->con, $sql);
 
         if ($result) {
             return mysqli_insert_id($this->con); // Trả về ID vừa insert
         } else {
-            // Có thể log lỗi: mysqli_error($this->con)
             return false;
         }
     }

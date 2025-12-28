@@ -184,7 +184,7 @@
 
         <div class="d-flex align-items-center gap-3">
             <?php if (isset($data['isLoggedIn']) && $data['isLoggedIn']): ?>
-                <a href="<?php echo $homeLink; ?>" class="btn btn-warning fw-bold text-dark">
+                <a href="/baitaplon/PostController" class="btn btn-warning fw-bold text-dark">
                     <i class="bi bi-pencil-square"></i> Đăng tin
                 </a>
 
