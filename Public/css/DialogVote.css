@@ -1,0 +1,154 @@
+/* ===== OVERLAY ===== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+/* ===== MODAL ===== */
+.modal {
+    width: 680px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 30px 60px rgba(0,0,0,.2);
+    padding: 24px;
+    animation: fadeIn .2s ease;
+}
+
+/* ===== HEADER ===== */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.btn-close {
+    border: none;
+    background: transparent;
+    font-size: 26px;
+    cursor: pointer;
+    opacity: .6;
+}
+
+/* ===== BODY ===== */
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.row {
+    display: flex;
+    gap: 16px;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* INPUT */
+.form-group input,
+.form-group textarea {
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    padding: 14px 18px;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-group textarea {
+    border-radius: 16px;
+    resize: none;
+    height: 120px;
+}
+
+.form-group input:disabled {
+    background: #f9fafb;
+    color: #555;
+}
+
+/* ===== STAR ===== */
+.star-rating {
+    display: flex;
+    flex-direction: row; /* Giữ nguyên chiều xuôi */
+    gap: 10px;           /* Tăng khoảng cách cho dễ bấm */
+    font-size: 32px;     /* Tăng kích thước sao to hơn */
+    cursor: pointer;
+    
+    /* 🔥 QUAN TRỌNG: Chống bôi đen sao khi click nhanh */
+    user-select: none;
+    -webkit-user-select: none; 
+}
+
+.star-rating span {
+    color: #e5e7eb;      /* Màu xám mặc định */
+    transition: all 0.2s ease;
+}
+
+/* Hiệu ứng khi di chuột vào ngôi sao (để biết là nút bấm được) */
+.star-rating span:hover {
+    transform: scale(1.2); /* Phóng to nhẹ khi di chuột */
+    color: #ffe066;        /* Màu vàng nhạt gợi ý */
+}
+
+/* Class .active này sẽ do Javascript thêm vào khi click */
+.star-rating span.active {
+    color: #ffca08; /* Màu vàng đậm (hoặc màu #22c1b5 của bạn) */
+    text-shadow: 0 0 10px rgba(255, 202, 8, 0.5); /* Hiệu ứng phát sáng */
+}
+
+/* ===== FOOTER ===== */
+.modal-footer {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-secondary {
+    padding: 12px 22px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    cursor: pointer;
+}
+
+.btn-primary {
+    padding: 12px 26px;
+    border-radius: 999px;
+    border: none;
+    background: #22c1b5;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ===== ANIMATION ===== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
