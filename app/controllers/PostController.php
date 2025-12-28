@@ -3,42 +3,49 @@
 require_once __DIR__ . '/../models/PostModel.php';
 
 class PostController {
-    private $postModel;
-    private $conn; // Cần biến này để quản lý Transaction
-    private $uploadDir;
-    private $dbPublicPath;
+        private $postModel;
+        private $conn; // Cần biến này để quản lý Transaction
+        private $uploadDir;
+        private $dbPublicPath;
 
-    public function __construct($conn) {
-        $this->conn = $conn;
-        $this->postModel = new PostModel($conn);
-        
-        // 1. Đường dẫn vật lý trên Server (Dùng để move_uploaded_file)
-        // __DIR__ là app/controllers -> ra ngoài 2 cấp là root -> vào public/images
-        $this->uploadDir = __DIR__ . '/../../public/images/';
-        
-        // 2. Đường dẫn lưu vào Database (Dùng để hiển thị thẻ <img src="...">)
-        // Giả sử thư mục gốc web trỏ vào folder chứa index.php
-        $this->dbPublicPath = 'public/images/'; 
-    }
+        public function __construct($conn) {
+            $this->conn = $conn;
+            $this->postModel = new PostModel($conn);
+            
+            // 1. Đường dẫn vật lý trên Server (Dùng để move_uploaded_file)
+            // __DIR__ là app/controllers -> ra ngoài 2 cấp là root -> vào public/images
+            $this->uploadDir = __DIR__ . '/../../public/images/';
+            
+            // 2. Đường dẫn lưu vào Database (Dùng để hiển thị thẻ <img src="...">)
+            // Giả sử thư mục gốc web trỏ vào folder chứa index.php
+            $this->dbPublicPath = 'public/images/'; 
+        }
 
-    public function index() {
-        require_once __DIR__ . '/../views/View_ThemSP.php';
-    }
+        public function index($id_user = 0) {
+            // Truyền biến $id_user_url sang view để dùng
+            $id_user_url = $id_user;
+            
+            // Cập nhật đường dẫn mới (đã chuyển vào thư mục Page)
+            require_once __DIR__ . '/../views/Page/View_ThemSP.php';
+        }
 
-    public function add() {
-        header('Content-Type: application/json; charset=utf-8');
-        
-        try {
-            // --- BẮT ĐẦU TRANSACTION ---
-            // Giúp rollback lại toàn bộ nếu có bất kỳ lỗi nào xảy ra ở giữa
-            $this->conn->beginTransaction();
+        public function add() {
+            header('Content-Type: application/json; charset=utf-8');
+            
+            try {
+                $this->conn->beginTransaction();
 
-            // 1. Validate dữ liệu cơ bản
-            if (empty($_POST['title']) || empty($_POST['price']) || empty($_POST['catLevel2'])) {
-                throw new Exception("Vui lòng nhập đầy đủ: Tiêu đề, Giá, Danh mục");
-            }
+                if (empty($_POST['title']) || empty($_POST['price']) || empty($_POST['catLevel2'])) {
+                    throw new Exception("Vui lòng nhập đầy đủ: Tiêu đề, Giá, Danh mục");
+                }
 
-            $id_user = $_SESSION['user_id'] ?? 1;
+                // SỬA: Ưu tiên lấy ID từ form (do URL truyền vào), nếu không có thì lấy session
+                if (isset($_POST['id_user_posted']) && !empty($_POST['id_user_posted'])) {
+                    $id_user = $_POST['id_user_posted'];
+                } else {
+                    $id_user = $_SESSION['user_id'] ?? 1;
+                }
+
             $ten_sanpham = trim($_POST['title']);
             $id_danhmuc = intval($_POST['catLevel2']);
             $gia = floatval($_POST['price']);
