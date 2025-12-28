@@ -1,0 +1,184 @@
+/* Reset & Base */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6;
+    color: #1f2937;
+    padding: 30px;
+}
+
+/* Layout Wrapper */
+.admin-wrapper {
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+/* Card Style */
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+/* Card Header */
+.card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+}
+
+.header-title { display: flex; align-items: center; gap: 12px; }
+.header-title h2 { font-size: 18px; font-weight: 600; color: #111827; margin: 0; }
+.header-title i { font-size: 20px; }
+.text-danger { color: #dc2626 !important; }
+
+/* Header Actions & Buttons */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.badge-count {
+    background: #eff6ff;
+    color: #2563eb;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* 🔥 Nút Xuất Excel */
+.btn-excel {
+    background-color: #107c41; /* Màu xanh Excel */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-excel:hover {
+    background-color: #0c5e31;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(16, 124, 65, 0.2);
+}
+
+/* Table Style */
+.table-responsive { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; text-align: left; }
+
+.table th {
+    background-color: #f9fafb;
+    padding: 12px 24px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6b7280;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table td {
+    padding: 16px 24px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 14px;
+}
+
+.table tbody tr:hover { background-color: #f9fafb; transition: background 0.2s; }
+.table tbody tr:last-child td { border-bottom: none; }
+
+/* Column Styles */
+.id-hash { font-family: monospace; color: #6b7280; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; }
+
+/* User Cell */
+.user-cell { display: flex; align-items: center; gap: 12px; }
+.avatar-circle {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; color: white; font-size: 14px;
+    flex-shrink: 0;
+}
+.bg-blue { background: #3b82f6; }
+.bg-red { background: #ef4444; }
+
+.user-info .name { font-weight: 500; color: #111827; }
+.user-info .sub-id { font-size: 12px; color: #9ca3af; }
+
+/* Reason & Description */
+.reason-tag {
+    display: inline-block;
+    font-size: 12px; font-weight: 600;
+    color: #b91c1c; background: #fef2f2;
+    padding: 2px 8px; border-radius: 4px; border: 1px solid #fecaca;
+    margin-bottom: 4px;
+}
+.description { font-size: 13px; color: #4b5563; line-height: 1.4; margin: 0; }
+
+/* Evidence Image */
+.evidence-link {
+    position: relative; display: block; width: 60px; height: 60px;
+    border-radius: 6px; overflow: hidden; border: 1px solid #e5e7eb;
+}
+.evidence-link img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+.evidence-link:hover img { transform: scale(1.1); }
+.zoom-icon {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.3);
+    display: flex; align-items: center; justify-content: center;
+    color: white; opacity: 0; transition: opacity 0.2s;
+}
+.evidence-link:hover .zoom-icon { opacity: 1; }
+.no-evidence { font-size: 13px; color: #9ca3af; font-style: italic; }
+
+/* Status Badges */
+.status-badge {
+    padding: 6px 12px; border-radius: 99px;
+    font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;
+}
+.status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+
+.status-pending { background: #fffbeb; color: #b45309; }
+.status-pending::before { background: #f59e0b; }
+
+.status-processed { background: #ecfdf5; color: #047857; }
+.status-processed::before { background: #10b981; }
+
+.status-rejected { background: #f3f4f6; color: #4b5563; }
+.status-rejected::before { background: #6b7280; }
+
+/* Action Buttons */
+.action-buttons { display: flex; justify-content: flex-end; gap: 8px; }
+.btn-icon {
+    width: 32px; height: 32px;
+    border: none; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s;
+}
+
+.btn-ban { background: #fee2e2; color: #dc2626; }
+.btn-ban:hover { background: #dc2626; color: white; transform: translateY(-2px); }
+
+.btn-ignore { background: #f3f4f6; color: #4b5563; }
+.btn-ignore:hover { background: #4b5563; color: white; transform: translateY(-2px); }
+
+.text-right { text-align: right; }
+.text-success { color: #10b981; font-size: 18px; }
+
+/* Empty State */
+.empty-state { text-align: center; padding: 40px !important; }
+.empty-state img { margin-bottom: 10px; opacity: 0.5; }
+.empty-state p { color: #6b7280; }

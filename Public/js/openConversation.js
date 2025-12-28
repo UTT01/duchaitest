@@ -1,8 +1,9 @@
 // Mở conversation
 function openConversation(conversationId) {
     window.location.href =
-        'index.php?action=index&conversation_id=' + conversationId;
+        '/baitaplon/chat/start/' + conversationId;
 }
+
 
 // Mở list option
 document.addEventListener('click', function (e) {
@@ -22,50 +23,41 @@ document.addEventListener('click', function (e) {
     }
 });
 
-function editMessage(id) {
-    // 1️⃣ Tìm message-content theo id
-    const msgEl = document.querySelector(
-        '.message-content[data-id="' + id + '"]'
-    );
+       let isEditing = false;
 
-    if (!msgEl) return;
+        function editMessage(id) {
+            // 1️⃣ Lấy element nội dung tin nhắn
+            const msgEl = document.querySelector(
+                '.message-content[data-id="' + id + '"]'
+            );
+            if (!msgEl) return;
 
-    // 2️⃣ Lấy nội dung text hiện tại
-    const content = msgEl.innerText.trim();
+            // 2️⃣ Lấy nội dung cũ
+            const content = msgEl.innerText.trim();
 
-    // 3️⃣ Đẩy nội dung xuống ô nhập liệu
-    const input = document.getElementById('chatInput');
-    input.value = content;
-    input.focus();
+            // 3️⃣ Đẩy nội dung xuống input chat
+            const input = document.getElementById('chatInput');
+            input.value = content;
+            input.focus();
 
-    // 4️⃣ (QUAN TRỌNG) Đổi đường dẫn form để gửi về hàm edit_msg trong Controller
-    const form = document.getElementById('chatForm'); // Đảm bảo form có id="chatForm"
-    if (form) {
-        form.action = '/baitaplon/Chat/edit_msg';
-    }
+            // 4️⃣ Đánh dấu đang sửa (QUAN TRỌNG)
+            document.getElementById('editMessageId').value = id;
+            isEditing = true;
 
-    // 5️⃣ Gán ID tin nhắn vào input ẩn (nếu chưa có input này thì phải tạo trong View)
-    // Bạn cần đảm bảo trong view chat_view.php có dòng: <input type="hidden" name="message_id" id="editMessageId">
-    const idInput = document.getElementById('editMessageId');
-    if (idInput) {
-        idInput.value = id;
-    }
-    
-    // Thay đổi nút gửi thành icon "Sửa" hoặc đổi màu để người dùng biết (Tuỳ chọn)
-    const btn = form.querySelector('button');
-    if(btn) {
-        btn.innerHTML = '✎'; // Biểu tượng bút chì
-        btn.style.backgroundColor = '#28a745'; // Màu xanh lá
-    }
-}
+            // 5️⃣ Đổi placeholder cho rõ trạng thái
+            input.placeholder = "Đang sửa tin nhắn...";
+        }
+
+
 
     function deleteMessage(id) {
         if (!confirm('Xóa tin nhắn này?')) return;
 
         const form = document.createElement('form');
         form.method = 'post';
-        // Sửa đường dẫn chuẩn MVC:
-        form.action = '/baitaplon/Chat/delete_msg'; 
+
+        // URL ĐẸP
+        form.action = '/baitaplon/chat/deleteMessage';
 
         form.innerHTML = `
             <input type="hidden" name="message_id" value="${id}">
@@ -74,4 +66,7 @@ function editMessage(id) {
         document.body.appendChild(form);
         form.submit();
     }
+
+
+
 

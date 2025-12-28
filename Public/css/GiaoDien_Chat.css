@@ -9,9 +9,13 @@
 body {
     background: #e5ddd5;
     height: 100vh;
-    overflow: hidden;
     /* 🔥 TĂNG SIZE CƠ BẢN LÊN 16PX */
     font-size: 16px; 
+}
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999; /* cực cao */
 }
 
 /* ================= CONTAINER ================= */
@@ -402,4 +406,76 @@ body {
     font-size: 24px; /* Dấu chấm to hơn */
     line-height: 0;
     color: #aaa;
+}
+
+
+/* ẩn tin nhắn không khớp */
+.message.hidden {
+    display: none;
+}
+
+.message-edited {
+    display: block;        /* 🔥 ép xuống dòng */
+    margin-top: 4px;
+    font-size: 11px;       /* nhỏ hơn nội dung */
+    color: #999;
+    font-style: italic;
+    line-height: 1.2;
+}
+
+.message-left .message-edited {
+    text-align: left;
+}
+
+.message-right .message-edited {
+    text-align: right;
+}
+
+#searchMessageForm {
+    width: 100%;
+    display: block;
+}
+.btn-back-home {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Căn giữa nội dung */
+    gap: 10px; /* Khoảng cách giữa icon và chữ */
+    
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px; /* Cách ô tìm kiếm bên dưới 1 chút */
+    
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px; /* Bo góc mềm mại */
+    
+    color: #475569; /* Màu chữ xám đậm sang trọng */
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    
+    transition: all 0.3s ease; /* Hiệu ứng mượt mà */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+/* Hiệu ứng khi di chuột vào (Hover) */
+.btn-back-home:hover {
+    background-color: #facc15; /* Màu vàng thương hiệu */
+    border-color: #facc15;
+    color: #0f172a; /* Màu chữ đen đậm */
+    
+    transform: translateY(-2px); /* Nổi lên nhẹ */
+    box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3); /* Đổ bóng vàng */
+}
+
+/* Style riêng cho icon mũi tên */
+.btn-back-home i {
+    font-size: 1.2rem;
+    color: #f59e0b; /* Icon màu cam ban đầu */
+    transition: color 0.3s ease;
+}
+
+/* Khi hover thì icon đổi sang màu đen cho đồng bộ */
+.btn-back-home:hover i {
+    color: #0f172a;
 }
