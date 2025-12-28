@@ -11,7 +11,7 @@ class UserModel
     public function getUserById($id_user)
     {
         $id_user = mysqli_real_escape_string($this->con, $id_user);
-        $sql = "SELECT * FROM users WHERE id_user = '$id_user'";
+        $sql = "SELECT * FROM users Join taikhoan on taikhoan.id_user = users.id_user WHERE users.id_user = '$id_user'";
         $result = mysqli_query($this->con, $sql);
         if ($result) {
             return mysqli_fetch_assoc($result);
@@ -23,18 +23,16 @@ class UserModel
     {
         $user = $this->getUserById($id_user);
         if ($user) {
-            if (isset($user['vaitro'])) {
-                return $user['vaitro'] == 'quanly' || $user['vaitro'] == 'admin';
+            if (isset($user['loaitaikhoan'])) {
+                return $user['loaitaikhoan'] == 'quanly' || $user['loaitaikhoan'] == 'admin';
             }
-            if (isset($user['role'])) {
-                return $user['role'] == 'quanly' || $user['role'] == 'admin' || $user['role'] == 'manager';
-            }
+            
             // Nếu không có cột vaitro/role, mặc định không phải quản lý
             return false;
         }
         return false;
     }
-    public function updateUser($id_user, $hoten, $sdt, $diachi, $gioithieu, $avatarUrl = null)
+    public function updateUser($id_user, $hoten, $sdt, $diachi, $gioithieu, $avatarUrl = null) /*thêm vào đây */
 {
     $id_user = mysqli_real_escape_string($this->con, $id_user);
     $hoten = mysqli_real_escape_string($this->con, $hoten);
@@ -69,7 +67,7 @@ class UserModel
         $username = mysqli_real_escape_string($this->con, trim($username));
         
         // Tìm user theo username trong bảng account
-        $sql = "SELECT * FROM account WHERE username = '$username' AND trangthai = 1";
+        $sql = "SELECT * FROM taikhoan WHERE email= '$username' AND trangthai = 'Hoạt động'";
         $result = mysqli_query($this->con, $sql);
         
         if ($result && mysqli_num_rows($result) > 0) {
@@ -77,7 +75,7 @@ class UserModel
             
             // Kiểm tra mật khẩu
             // Hỗ trợ cả password đã hash (password_hash) và plain text
-            $storedPassword = $user['password'];
+            $storedPassword = $user['matkhau'];
             
             // Nếu password bắt đầu bằng $2y$ hoặc $2a$ thì là password đã hash
             if (strpos($storedPassword, '$2y$') === 0 || strpos($storedPassword, '$2a$') === 0) {

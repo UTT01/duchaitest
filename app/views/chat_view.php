@@ -33,10 +33,10 @@
                     <div class="chat-user <?= ($c['id_conversation'] == ($active_conversation_id ?? 0)) ? 'active' : '' ?>"
                         onclick="window.location.href='/baitaplon/Chat/index/<?= $c['id_user'] ?>/<?= $my_id ?>'">
 
-                        <div class="avatar"><?= strtoupper(substr($c['username'], 0, 1)) ?></div>
+                        <div class="avatar"><?= strtoupper(substr($c['hoten'], 0, 1)) ?></div>
 
                         <div class="chat-user-info">
-                            <div class="username"><?= htmlspecialchars($c['username']) ?></div>
+                            <div class="username"><?= htmlspecialchars($c['hoten']) ?></div>
                             <div class="last-message"><?= htmlspecialchars($c['last_message'] ?? 'Chưa có tin nhắn') ?></div>
                         </div>
 

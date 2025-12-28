@@ -67,8 +67,8 @@ class ChatModel {
 
         // 3️⃣ Insert tin nhắn
         $sql = "
-            INSERT INTO messages (id_conversation, sender_id, content)
-            VALUES (?, ?, ?)
+            INSERT INTO messages (id_conversation, id_user, noidung) 
+            VALUES (?, ?, ?);
         ";
 
         $stmt = $this->conn->prepare($sql);
@@ -94,14 +94,14 @@ class ChatModel {
         $sql = "
             SELECT 
                 m.id_message,
-                m.sender_id,
+                m.id_user AS sender_id,  -- Đổi tên alias cho code PHP đỡ phải sửa
                 u.hoten AS sender_name, 
-                m.content,
-                m.created_at
+                m.noidung AS content,    -- Alias lại thành content
+                m.thoigian AS created_at -- Alias lại thành created_at
             FROM messages m
-            JOIN users u ON m.sender_id = u.id_user
+            JOIN users u ON m.id_user = u.id_user -- Sửa sender_id thành id_user
             WHERE m.id_conversation = ?
-            ORDER BY m.created_at ASC
+            ORDER BY m.thoigian ASC;
         ";
 
         $stmt = $this->conn->prepare($sql);
@@ -149,7 +149,7 @@ class ChatModel {
         FROM messages m
         JOIN users u ON m.sender_id = u.id_user
         WHERE m.id_conversation = ?
-        ORDER BY m.created_at DESC
+        ORDER BY m.thoigian DESC
         LIMIT 1
     ";
 
@@ -170,23 +170,20 @@ class ChatModel {
                 u.id_user,
                 u.hoten as username,
                 (
-                    SELECT m.content
+                    SELECT m.noidung        -- Sửa content thành noidung
                     FROM messages m
                     WHERE m.id_conversation = c.id_conversation
-                    ORDER BY m.created_at DESC
+                    ORDER BY m.thoigian DESC -- Sửa created_at thành thoigian
                     LIMIT 1
                 ) AS last_message
             FROM conversations c
-            JOIN conversation_users cu1 
-                ON c.id_conversation = cu1.id_conversation
-            JOIN conversation_users cu2 
-                ON c.id_conversation = cu2.id_conversation
-            JOIN users u 
-                ON cu2.id_user = u.id_user
+            JOIN conversation_users cu1 ON c.id_conversation = cu1.id_conversation
+            JOIN conversation_users cu2 ON c.id_conversation = cu2.id_conversation
+            JOIN users u ON cu2.id_user = u.id_user
             WHERE cu1.id_user = ?
             AND cu2.id_user != ?
             AND u.hoten LIKE ?
-            ORDER BY c.last_message_at DESC
+            ORDER BY c.last_message_at DESC;
         ";
 
         $stmt = $this->conn->prepare($sql);
@@ -202,32 +199,33 @@ class ChatModel {
     public function loadConversations($user_id){
         // SỬA: u.username -> u.hoten
         $sql = "
-            SELECT 
-                c.id_conversation,
-                c.last_message_at,
-                u.id_user,
-                u.hoten as username,
-                (
-                    SELECT m.content
-                    FROM messages m
-                    WHERE m.id_conversation = c.id_conversation
-                    ORDER BY m.created_at DESC
-                    LIMIT 1
-                ) AS last_message
-            FROM conversations c
-            JOIN conversation_users cu1 
-                ON c.id_conversation = cu1.id_conversation
-            JOIN conversation_users cu2 
-                ON c.id_conversation = cu2.id_conversation
-            JOIN users u 
-                ON u.id_user = cu2.id_user
-            WHERE cu1.id_user = ?
-            AND cu2.id_user != ?
-            ORDER BY c.last_message_at DESC
+           SELECT 
+            c.id_conversation,
+            c.last_message_at,
+            u.id_user,
+            u.hoten,          -- Lấy tên người chat cùng
+            u.avatar,         -- Nên lấy thêm avatar để hiển thị cho đẹp
+            (
+                SELECT m.noidung
+                FROM messages m
+                WHERE m.id_conversation = c.id_conversation
+                ORDER BY m.thoigian DESC
+                LIMIT 1
+            ) AS last_message
+        FROM conversations c
+        JOIN conversation_users cu1 
+            ON c.id_conversation = cu1.id_conversation
+        JOIN conversation_users cu2 
+            ON c.id_conversation = cu2.id_conversation
+        JOIN users u 
+            ON u.id_user = cu2.id_user
+        WHERE cu1.id_user = ?     -- ID của người đang đăng nhập (Bạn)
+        AND cu2.id_user != ?    -- ID của người kia (Để không lấy chính mình)
+        ORDER BY c.last_message_at DESC
         ";
 
         $stmt = $this->conn->prepare($sql);
-        // Đã đúng: ss
+
         $stmt->bind_param("ss", $user_id, $user_id);
         $stmt->execute();
 
@@ -254,9 +252,11 @@ class ChatModel {
 
     public function updateMessage($message_id, $user_id, $content){
         $sql = "
-            UPDATE messages
-            SET content = ?, updated_at = NOW()
-            WHERE id_message = ? AND sender_id = ?
+           UPDATE messages
+            SET noidung = ?,     
+                thoigian = NOW()  
+            WHERE id_message = ? 
+            AND id_user = ?;
         ";
 
         $stmt = $this->conn->prepare($sql);
@@ -267,9 +267,9 @@ class ChatModel {
 
     public function deleteMessage($message_id, $user_id){
         $sql = "
-            DELETE FROM messages
+           DELETE FROM messages
             WHERE id_message = ?
-              AND sender_id = ?
+            AND id_user = ?;
         ";
 
         $stmt = $this->conn->prepare($sql);

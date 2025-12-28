@@ -22,13 +22,13 @@ class PostModel
         $khu_vuc_ban = mysqli_real_escape_string($this->con, $khu_vuc_ban);
 
         // SỬA: Thêm cột khu_vuc_ban vào câu lệnh SQL
-        $sql = "INSERT INTO sanpham (ten_sanpham, id_danhmuc, id_user, gia, mota, anh_dai_dien, khu_vuc_ban, ngaydang, trangthai) 
+        $sql = "INSERT INTO sanpham (ten_sanpham, id_danhmuc, id_user, gia, mota, avatar, khu_vuc_ban, ngaydang, trangthai) 
                 VALUES ('$ten_sanpham', '$id_danhmuc', '$id_user', '$gia', '$mota', '$anh_dai_dien', '$khu_vuc_ban', NOW(), 'Chờ duyệt')";
 
         $result = mysqli_query($this->con, $sql);
 
         if ($result) {
-            return $id_sanpham; // Trả về ID vừa insert
+            return mysqli_insert_id($this->con);// Trả về ID vừa insert
         } else {
             return false;
         }
