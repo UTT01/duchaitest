@@ -143,7 +143,7 @@ if (!function_exists('buildHomeUrl')) {
 
             <li class="page-item <?php echo ($page >= $totalPages) ? 'disabled' : ''; ?>">
                 <a class="page-link"
-                   href="<?php echo ($page < $totalPages) ? buildHomeUrl($page + 1, $keyword, $category, $address) : '#'; ?>">
+                   href="<?php echo ($page < $totalPages) ? buildHomeUrl($page + 1, $keyword, $category, $address, $currentUserId) : '#'; ?>">
                     Sau &raquo;
                 </a>
             </li>

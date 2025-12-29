@@ -268,7 +268,7 @@
         ?>
 
         <a class="navbar-brand" href="<?php echo $homeLink; ?>">
-            Chợ Tốt Clone
+            Rì Cũng Bán
         </a>
 
         <form class="d-flex flex-grow-1 mx-3 search-bar align-items-center gap-2" method="GET" action="/baitaplon/Home/index">
