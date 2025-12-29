@@ -523,17 +523,32 @@
         });
 
         function loadProducts() {
-            fetch('?controller=admin&action=getPendingProducts')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        allProducts = data.data;
-                        renderPage(1);
-                    } else {
-                        alert('Lỗi: ' + data.error);
+            fetch('?controller=Admin&action=getPendingProducts')
+                .then(res => {
+                    console.log('Response status:', res.status);
+                    console.log('Response headers:', res.headers.get('content-type'));
+                    return res.text(); // Lấy text thay vì JSON để debug
+                })
+                .then(text => {
+                    console.log('Raw response:', text.substring(0, 500)); // Log 500 ký tự đầu
+
+                    try {
+                        const data = JSON.parse(text);
+                        if (data.success) {
+                            allProducts = data.data;
+                            renderPage(1);
+                        } else {
+                            alert('Lỗi: ' + data.error);
+                        }
+                    } catch (e) {
+                        console.error('JSON parse error:', e);
+                        alert('Lỗi parse JSON: ' + e.message + '\nResponse: ' + text.substring(0, 200));
                     }
                 })
-                .catch(err => alert('Lỗi load sản phẩm: ' + err.message));
+                .catch(err => {
+                    console.error('Fetch error:', err);
+                    alert('Lỗi load sản phẩm: ' + err.message);
+                });
         }
 
         function renderPage(page) {
@@ -608,13 +623,23 @@
         }
 
         function viewDetail(id_sanpham) {
-            fetch('?controller=admin&action=getProductDetail&id_sanpham=' + id_sanpham)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        displayDetail(data);
-                    } else {
-                        alert('Lỗi: ' + data.error);
+            fetch('?controller=Admin&action=getProductDetail&id_sanpham=' + id_sanpham)
+                .then(res => {
+                    console.log('getProductDetail response status:', res.status);
+                    return res.text();
+                })
+                .then(text => {
+                    console.log('getProductDetail raw response:', text.substring(0, 200));
+                    try {
+                        const data = JSON.parse(text);
+                        if (data.success) {
+                            displayDetail(data);
+                        } else {
+                            alert('Lỗi: ' + data.error);
+                        }
+                    } catch (e) {
+                        console.error('getProductDetail JSON parse error:', e);
+                        alert('Lỗi parse JSON trong getProductDetail: ' + e.message);
                     }
                 });
         }
@@ -698,7 +723,7 @@
             const formData = new FormData();
             formData.append('id_sanpham', id_sanpham);
 
-            fetch('?controller=admin&action=approve', {
+            fetch('?controller=Admin&action=approve', {
                 method: 'POST',
                 body: formData
             })
@@ -717,7 +742,7 @@
         function approveAllProducts() {
             if (!confirm('Bạn có chắc muốn duyệt TẤT CẢ sản phẩm chờ duyệt?')) return;
 
-            fetch('?controller=admin&action=approveAll', {
+            fetch('?controller=Admin&action=approveAll', {
                 method: 'POST'
             })
             .then(res => res.json())
@@ -745,7 +770,7 @@
             formData.append('id_sanpham', currentProductId);
             formData.append('reason', '');
 
-            fetch('?controller=admin&action=reject', {
+            fetch('?controller=Admin&action=reject', {
                 method: 'POST',
                 body: formData
             })

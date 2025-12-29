@@ -12,8 +12,9 @@ class DuyetSPModel
     public function getPendingProducts()
     {
         // Lưu ý: Đã đổi sp.avatar thành sp.anh_dai_dien
-        $sql = "SELECT sp.id_sanpham, sp.ten_sanpham, sp.gia, sp.mota, sp.anh_dai_dien, sp.ngaydang, 
-                       dm.ten_danhmuc, u.hoten, u.sdt
+        $sql = "SELECT sp.id_sanpham, sp.ten_sanpham, sp.gia, sp.mota,
+                       COALESCE(sp.avatar, 'public/images/default.jpg') as avatar,
+                       sp.ngaydang, dm.ten_danhmuc, u.hoten, u.sdt
                 FROM sanpham sp
                 JOIN danhmuc dm ON sp.id_danhmuc = dm.id_danhmuc
                 JOIN users u ON sp.id_user = u.id_user
@@ -21,12 +22,16 @@ class DuyetSPModel
                 ORDER BY sp.ngaydang DESC";
 
         $result = mysqli_query($this->con, $sql);
-        $data = [];
-        if ($result) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                $data[] = $row;
-            }
+
+        if (!$result) {
+            throw new Exception("Database query failed: " . mysqli_error($this->con));
         }
+
+        $data = [];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $data[] = $row;
+        }
+
         return $data;
     }
 
@@ -103,10 +108,18 @@ class DuyetSPModel
     }
 
     // Từ chối sản phẩm
-    public function rejectProduct($id_sanpham)
+    public function rejectProduct($id_sanpham, $reason = '')
     {
         $id_sanpham = mysqli_real_escape_string($this->con, $id_sanpham);
-        $sql = "UPDATE sanpham SET trangthai = 'Từ chối' WHERE id_sanpham = '$id_sanpham'";
+        $reason = mysqli_real_escape_string($this->con, $reason);
+
+        // Cập nhật trạng thái và lưu lý do từ chối (nếu có cột ly_do_tu_choi trong DB)
+        if (!empty($reason)) {
+            $sql = "UPDATE sanpham SET trangthai = 'Từ chối', ly_do_tu_choi = '$reason' WHERE id_sanpham = '$id_sanpham'";
+        } else {
+            $sql = "UPDATE sanpham SET trangthai = 'Từ chối' WHERE id_sanpham = '$id_sanpham'";
+        }
+
         return mysqli_query($this->con, $sql);
     }
 }

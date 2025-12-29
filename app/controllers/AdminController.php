@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../models/DuyetSPModel.php';
+
 class AdminController {
     private $duyetSPModel;
 
@@ -20,6 +22,7 @@ class AdminController {
     // API: Lấy danh sách sản phẩm chờ duyệt (JSON)
     public function getPendingProducts() {
         header('Content-Type: application/json; charset=utf-8');
+
         try {
             $products = $this->duyetSPModel->getPendingProducts();
             echo json_encode([
