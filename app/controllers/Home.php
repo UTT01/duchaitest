@@ -2,12 +2,13 @@
 // app/controllers/Home.php
 require_once __DIR__ . '/../models/SanphamModel.php';
 require_once __DIR__ . '/../models/DuyetSPModel.php';
+// Thêm model Categories để lấy danh mục cha/con
+require_once __DIR__ . '/../models/CategoriesModel.php';
 
 class Home
 {
     private $conn;
 
-    // 1. Nhận $conn từ index.php
     public function __construct($conn)
     {
         $this->conn = $conn;
@@ -15,21 +16,20 @@ class Home
 
     public function index($user_id = null)
     {
-        // Xử lý logout nếu có
         if (isset($_GET['logout']) && $_GET['logout'] == '1') {
             session_destroy();
             header("Location: /baitaplon/Home");
             exit();
         }
         
-        // 2. Khởi tạo Model trực tiếp với $this->conn
         $sanphamModel = new SanphamModel($this->conn);
+        // Khởi tạo model Categories
+        $cateModel = new CategoriesModel($this->conn);
 
         if ($user_id === null) {
             $user_id = isset($_GET['user_id']) ? trim($_GET['user_id']) : '';
         }
-        $userId = !empty($user_id) ? $user_id : '';
-
+        
         $keyword  = isset($_GET['q']) ? trim($_GET['q']) : '';
         $category = isset($_GET['danhmuc']) ? trim($_GET['danhmuc']) : '';
         $address  = isset($_GET['diachi']) ? trim($_GET['diachi']) : '';
@@ -41,13 +41,40 @@ class Home
 
         $totalProducts = $sanphamModel->countProducts($keyword, $category, $address, '');
         $totalPages    = ($totalProducts > 0) ? ceil($totalProducts / $limit) : 1;
-
         $products = $sanphamModel->getProducts($keyword, $category, $address, $offset, $limit, '');
-        $categories = $sanphamModel->getAllCategories();
+
+        // --- BẮT ĐẦU SỬA: Lấy cấu trúc danh mục Cha - Con ---
+        $parents = $cateModel->getParentCategories();
+        $categoryTree = [];
+        foreach ($parents as $p) {
+            // Lấy con của từng cha
+            $p['children'] = $cateModel->getSubCategories($p['id_danhmuc']);
+            $categoryTree[] = $p;
+        }
+        // --- KẾT THÚC SỬA ---
+
+        // Tìm tên danh mục hiện tại để hiển thị lên nút
+        $currentCategoryName = 'Tất cả danh mục';
+        if (!empty($category)) {
+            // Logic đơn giản để tìm tên danh mục đang chọn (có thể tối ưu hơn trong Model)
+            foreach ($categoryTree as $cat) {
+                if ($cat['id_danhmuc'] == $category) {
+                    $currentCategoryName = $cat['ten_danhmuc'];
+                    break;
+                }
+                foreach ($cat['children'] as $child) {
+                    if ($child['id_danhmuc'] == $category) {
+                        $currentCategoryName = $child['ten_danhmuc'];
+                        break;
+                    }
+                }
+            }
+        }
 
         $data = [
             'products'      => $products,
-            'categories'    => $categories,
+            'categoryTree'  => $categoryTree, // Truyền cây danh mục sang View
+            'currentCatName'=> $currentCategoryName, // Tên danh mục đang chọn
             'keyword'       => $keyword,
             'category'      => $category,
             'address'       => $address,
@@ -59,11 +86,10 @@ class Home
             'isLoggedIn'    => !empty($user_id)
         ];
 
-        // 3. Gọi View trực tiếp (không qua hàm trung gian)
-        // Biến $data sẽ được dùng trong view home.php
         require_once __DIR__ . '/../views/home.php';
     }
 
+    // ... (Giữ nguyên các hàm khác như detail_Sanpham)
     public function detail_Sanpham($id_sanpham, $user_id = '')
     {
         $productModel = new SanphamModel($this->conn);

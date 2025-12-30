@@ -1,0 +1,292 @@
+/* Overall interface: soft tones, light on the eyes */
+body {
+    background: #f1f5f9;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #0f172a;
+}
+
+/* Navbar */
+.navbar {
+    background: #ffffffcc;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #e2e8f0;
+    /* --- ADDITIONAL SO THAT THE MENU IS NOT COVERED --- */
+    position: relative; 
+    z-index: 1050; /* Make sure the navbar always floats on other components */
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #f59e0b !important;
+}
+
+/* Navbar Search Form */
+.search-bar {
+    background: #f8fafc;
+    border-radius: 999px;
+    padding: 6px 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.search-bar .form-control,
+.search-bar .form-select {
+    border: none;
+    background: transparent;
+    box-shadow: none !important;
+}
+
+.search-bar .form-control::placeholder {
+    color: #94a3b8;
+}
+
+.search-bar .btn-search {
+    border-radius: 999px;
+    padding-inline: 20px;
+    font-weight: 600;
+}
+
+/* Nút màu vàng nhưng giảm độ chói */
+.btn-warning,
+.btn-warning:hover,
+.btn-warning:focus {
+    background-color: #facc15;
+    border-color: #eab308;
+    color: #1f2933;
+}
+
+/* Thẻ sản phẩm */
+.product-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    background: #ffffff;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 30px rgba(15, 23, 42, 0.08);
+    border-color: #cbd5f5;
+}
+
+.product-card img {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.badge-category {
+    background-color: #f97316;
+    color: #ffffff;
+    border-radius: 999px;
+    font-weight: 500;
+    font-size: 0.75rem;
+    padding-inline: 10px;
+}
+
+/* Tiêu đề khối nội dung chính */
+.page-header-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.page-header-title small {
+    font-weight: 400;
+}
+
+/* Nút phân trang */
+.pagination .page-link {
+    border-radius: 999px !important;
+    margin-inline: 2px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #0f172a;
+    border-color: #0f172a;
+}
+
+/* Bo góc & nền nhẹ cho container chính */
+.main-container {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+@media (max-width: 768px) {
+    .search-bar {
+        border-radius: 16px;
+        padding: 8px;
+    }
+}
+
+/* Styles for post modal form */
+.upload-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.upload-box-btn {
+    width: 100px;
+    height: 100px;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.upload-box-btn:hover {
+    border-color: #f59e0b;
+    background: #fef3c7;
+}
+
+.upload-box-btn span {
+    font-size: 24px;
+    color: #f59e0b;
+    font-weight: bold;
+}
+
+.upload-box-btn p {
+    margin: 5px 0 0 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.upload-box-btn input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.upload-box-btn {
+    position: relative;
+}
+
+.image-item {
+    position: relative;
+    display: inline-block;
+}
+
+.image-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.btn-remove-img {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.error-msg {
+    display: none;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+.input-error {
+    border-color: #dc3545 !important;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+.dropdown-menu {
+    margin-top: 0;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
+}
+
+/* Khi hover vào item cha, hiển thị submenu */
+.dropdown-item-parent {
+    position: relative; 
+}
+
+/* Submenu mặc định ẩn */
+.dropdown-menu .submenu { 
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: -7px; /* Căn chỉnh vị trí top cho khớp */
+    margin-left: 0.1rem;
+    margin-top: 0px;
+    min-width: 200px;
+}
+
+/* Hiển thị submenu khi hover */
+.dropdown-item-parent:hover > .submenu {
+    display: block;
+}
+
+/* Mũi tên chỉ sang phải cho danh mục có con */
+.dropdown-item-parent > a::after {
+    content: "\F285"; /* Bootstrap icon code for chevron-right */
+    font-family: "bootstrap-icons";
+    position: absolute;
+    right: 15px;
+    font-size: 0.8rem;
+    color: #999;
+}
+
+/* Style cho nút dropdown giả lập select box */
+.custom-dropdown-btn {
+    background-color: transparent;
+    border: none;
+    color: #333;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+}
+
+/* Xóa mũi tên mặc định của dropdown bootstrap để tự style */
+.dropdown-toggle::after {
+    margin-left: 0.5em;
+}
