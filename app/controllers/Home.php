@@ -1,6 +1,7 @@
 <?php
 // app/controllers/Home.php
 require_once __DIR__ . '/../models/SanphamModel.php';
+require_once __DIR__ . '/../models/DuyetSPModel.php';
 
 class Home
 {
@@ -66,14 +67,17 @@ class Home
     public function detail_Sanpham($id_sanpham, $user_id = '')
     {
         $productModel = new SanphamModel($this->conn);
+        $duyetSPModel = new DuyetSPModel($this->conn);
         $product = $productModel->getProductById($id_sanpham);
         $productImages = $productModel->getProductImages($id_sanpham);
+        $productAttributes = $duyetSPModel->getProductAttributes($id_sanpham);
         
         $userId = isset($user_id) ? $user_id : '';
 
         $data = [
             'product'       => $product,
             'productImages' => $productImages,
+            'productAttributes' => $productAttributes,
             'page'          => 'detail_sanpham',
             'user_id'       => $userId,
             'isLoggedIn'    => !empty($userId)

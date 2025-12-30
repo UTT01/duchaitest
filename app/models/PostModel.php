@@ -23,7 +23,7 @@ class PostModel
 
         // SỬA: Thêm cột khu_vuc_ban vào câu lệnh SQL
         $sql = "INSERT INTO sanpham (ten_sanpham, id_danhmuc, id_user, gia, mota, avatar, khu_vuc_ban, ngaydang, trangthai) 
-                VALUES ('$ten_sanpham', '$id_danhmuc', '$id_user', '$gia', '$mota', '$anh_dai_dien', '$khu_vuc_ban', NOW(), N'Đã duyệt')";
+                VALUES ('$ten_sanpham', '$id_danhmuc', '$id_user', '$gia', '$mota', '$anh_dai_dien', '$khu_vuc_ban', NOW(), N'Chờ duyệt')";
 
         $result = mysqli_query($this->con, $sql);
 

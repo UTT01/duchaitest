@@ -4,6 +4,7 @@
 // Hứng dữ liệu từ Controller
 $p = isset($data['product']) ? $data['product'] : null;
 $imgs = isset($data['productImages']) ? $data['productImages'] : [];
+$attrs = isset($data['productAttributes']) ? $data['productAttributes'] : [];
 $baseUrl = "/baitaplon";
 
 // Lấy ID người xem (để xử lý link Home và link Chat)
@@ -29,7 +30,13 @@ if (!$p) {
 
 // Xử lý ảnh đại diện mặc định
 $mainAvatar = !empty($p['avatar_user']) ? "/baitaplon/" . $p['avatar_user'] : 'https://via.placeholder.com/150';
-$mainImg = !empty($p['anh_dai_dien']) ? "/baitaplon/" . $p['anh_dai_dien'] : 'https://via.placeholder.com/500';
+
+// Xử lý ảnh sản phẩm chính: Ưu tiên ảnh đầu tiên từ gallery, nếu không có dùng ảnh đại diện sản phẩm
+if (!empty($imgs) && !empty($imgs[0]['url_anh'])) {
+    $mainImg = "/baitaplon/" . $imgs[0]['url_anh'];
+} else {
+    $mainImg = !empty($p['anh_dai_dien']) ? "/baitaplon/" . $p['anh_dai_dien'] : 'https://via.placeholder.com/500';
+}
 ?>
 
 <div class="container mt-5 mb-5">
@@ -53,9 +60,9 @@ $mainImg = !empty($p['anh_dai_dien']) ? "/baitaplon/" . $p['anh_dai_dien'] : 'ht
     <div class="row">
         <div class="col-md-6 mb-4">
             <div class="card border-0">
-                <div class="main-image-box mb-3 text-center border rounded p-2" style="background: #f8f9fa;">
+                <div class="main-image-box mb-3 text-center border rounded p-3" style="background: #f8f9fa; height: 500px; display: flex; align-items: center; justify-content: center;">
                    <img id="mainImage" src="<?php echo htmlspecialchars($mainImg); ?>"
-                         class="img-fluid" style="max-height: 400px; object-fit: contain;" alt="Ảnh sản phẩm">
+                         class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;" alt="Ảnh sản phẩm">
                 </div>
 
                 <div class="d-flex overflow-auto gap-2">
@@ -160,6 +167,28 @@ $mainImg = !empty($p['anh_dai_dien']) ? "/baitaplon/" . $p['anh_dai_dien'] : 'ht
             </div>
         </div>
     </div>
+
+    <?php if (!empty($attrs)): ?>
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-bold text-uppercase">
+                    Thuộc tính sản phẩm
+                </div>
+                <div class="card-body">
+                    <div class="attributes-list">
+                        <?php foreach ($attrs as $attr): ?>
+                            <div class="attribute-item">
+                                <span class="attr-name"><?php echo htmlspecialchars($attr['ten_thuoctinh']); ?>:</span>
+                                <span class="attr-value"><?php echo htmlspecialchars($attr['giatri']); ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 </div>
 
 <script>
@@ -186,5 +215,30 @@ $mainImg = !empty($p['anh_dai_dien']) ? "/baitaplon/" . $p['anh_dai_dien'] : 'ht
         color: #f59e0b !important;
         text-decoration: underline !important;
         cursor: pointer;
+    }
+    .attributes-list {
+        background: #f9f9f9;
+        padding: 12px;
+        border-radius: 4px;
+        margin-top: 8px;
+    }
+
+    .attribute-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+    }
+
+    .attribute-item:last-child {
+        border-bottom: none;
+    }
+
+    .attr-name {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .attr-value {
+        color: #666;
     }
 </style>

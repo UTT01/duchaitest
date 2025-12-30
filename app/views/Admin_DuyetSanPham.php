@@ -576,7 +576,7 @@
 
             productList.innerHTML = products.map(product => `
                 <div class="product-card">
-                    <img src="${product.avatar}" alt="${product.ten_sanpham}" class="product-image" onclick="viewDetail(${product.id_sanpham})">
+                    <img src="/baitaplon/${product.avatar}" alt="${product.ten_sanpham}" class="product-image" onclick="viewDetail(${product.id_sanpham})">
                     <div class="product-info">
                         <div class="product-name">${product.ten_sanpham}</div>
                         <div class="product-price">${formatPrice(product.gia)} VNĐ</div>
@@ -661,7 +661,7 @@
             `;
 
             images.forEach(img => {
-                html += `<img src="${img.url_anh}" alt="Ảnh" onclick="openLightbox('${img.url_anh}')">`;
+                html += `<img src="/baitaplon/${img.url_anh}" alt="Ảnh" onclick="openLightbox('/baitaplon/${img.url_anh}')">`;
             });
 
             html += `

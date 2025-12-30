@@ -4,9 +4,16 @@ session_start();
 // 1. Kết nối CSDL (luôn cần thiết)
 require_once __DIR__ . '/app/config/ConnectDB.php';
 
-// 2. Lấy URL từ .htaccess truyền vào
+// 2. Lấy URL từ .htaccess truyền vào hoặc từ query parameters
 // Mặc định nếu không có url thì về Home/index
-$url = isset($_GET['url']) ? $_GET['url'] : 'Home/index';
+if (isset($_GET['controller']) && isset($_GET['action'])) {
+    // Hỗ trợ format cũ: ?controller=Admin&action=getPendingProducts
+    $url = $_GET['controller'] . '/' . $_GET['action'];
+} elseif (isset($_GET['url'])) {
+    $url = $_GET['url'];
+} else {
+    $url = 'Home/index';
+}
 
 // 3. Xử lý chuỗi URL: Xóa khoảng trắng, lọc ký tự lạ, cắt thành mảng
 $url = rtrim($url, '/');
@@ -19,21 +26,25 @@ if (!empty($urlArr[0])) {
     $controllerName = ucfirst($urlArr[0]);
 }
 
-// Kiểm tra file controller có tồn tại không
+// Kiểm tra file controller có tồn tại không (thử cả với và không có "Controller" suffix)
 $controllerFile = __DIR__ . '/app/controllers/' . $controllerName . '.php';
+$controllerFileWithSuffix = __DIR__ . '/app/controllers/' . $controllerName . 'Controller.php';
 
 if (file_exists($controllerFile)) {
     require_once $controllerFile;
-    
-    // Khởi tạo Controller và truyền $conn vào
-    if (class_exists($controllerName)) {
-        $controller = new $controllerName($conn);
-    } else {
-        die("Lỗi: Không tìm thấy class '$controllerName' trong file.");
-    }
+} elseif (file_exists($controllerFileWithSuffix)) {
+    require_once $controllerFileWithSuffix;
+    $controllerName = $controllerName . 'Controller'; // Cập nhật tên class
 } else {
     // Xử lý khi gõ sai tên Controller (Ví dụ: /Abcxyz)
     die("Lỗi 404: Không tìm thấy trang (Controller '$controllerName' not found).");
+}
+
+// Khởi tạo Controller và truyền $conn vào
+if (class_exists($controllerName)) {
+    $controller = new $controllerName($conn);
+} else {
+    die("Lỗi: Không tìm thấy class '$controllerName' trong file.");
 }
 
 // --- BƯỚC B: XÁC ĐỊNH ACTION (HÀM) ---
