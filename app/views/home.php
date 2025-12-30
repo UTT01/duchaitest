@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
     <link rel="stylesheet" href="/baitaplon/Public/css/home_css.css?v=<?php echo time(); ?>">
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 
@@ -88,7 +90,25 @@
                 </ul>
             </div>
             <input class="form-control" type="text" name="q" placeholder="Tìm kiếm..." value="<?php echo htmlspecialchars($keyword); ?>">
-            <input class="form-control" type="text" name="diachi" placeholder="Khu vực..." value="<?php echo htmlspecialchars($address); ?>">
+            <div class="dropdown" id="nav-location-dropdown">
+                <input type="hidden" name="diachi" id="nav-input-diachi" value="<?php echo htmlspecialchars($address); ?>">
+                
+                <button class="btn btn-outline-secondary dropdown-toggle text-truncate bg-white" type="button" 
+                        id="navLocationBtn" data-bs-toggle="dropdown" aria-expanded="false" 
+                        style="min-width: 150px; max-width: 200px; height: 100%;">
+                    <?php echo !empty($address) ? htmlspecialchars($address) : 'Toàn quốc'; ?>
+                </button>
+                
+                <div class="dropdown-menu p-2 shadow mt-1" aria-labelledby="navLocationBtn" style="width: 300px;">
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control border-start-0" id="nav-search-box" placeholder="Nhập Huyện hoặc Tỉnh..." autocomplete="off">
+                    </div>
+                    
+                    <div class="list-group list-group-flush" id="nav-location-list" style="max-height: 300px; overflow-y: auto;">
+                    </div>
+                </div>
+</div>
             <button class="btn btn-warning btn-search" type="submit">Tìm kiếm</button>
         </form>
 
@@ -192,10 +212,44 @@
                         <div class="error-msg text-danger" id="err-description">Mô tả quá ngắn (tối thiểu 10 từ).</div>
                     </div>
 
-                    <div class="form-group mb-3">
-                        <label>Địa chỉ giao dịch <span style="color:red">*</span></label>
-                        <input type="text" id="address" name="address" class="form-control" placeholder="Địa chỉ cụ thể...">
-                        <div class="error-msg text-danger" id="err-address">Nhập địa chỉ.</div>
+                   <div class="form-group mb-3">
+                        <label class="form-label fw-bold">Địa chỉ giao dịch <span class="text-danger">*</span></label>
+                        
+                        <div class="dropdown" id="address-picker-container">
+                            <button class="btn border w-100 text-start d-flex justify-content-between align-items-center bg-white" 
+                                    type="button" 
+                                    id="addressDropdownBtn" 
+                                    data-bs-toggle="dropdown" 
+                                    data-bs-auto-close="outside"
+                                    aria-expanded="false"
+                                    style="height: 45px;">
+                                <span id="address-label" class="text-muted">Chọn Tỉnh/Thành, Quận/Huyện...</span>
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+
+                            <div class="dropdown-menu w-100 p-2 shadow mt-1" aria-labelledby="addressDropdownBtn">
+                                
+                                <div class="mb-2">
+                                    <div id="district-header" class="d-none mb-2 pb-2 border-bottom">
+                                        <a href="#" class="text-decoration-none text-primary small fw-bold" id="btn-back-province">
+                                            <i class="bi bi-arrow-left"></i> Chọn lại Tỉnh
+                                        </a>
+                                        <div class="mt-1 fw-bold text-dark" id="selected-province-display"></div>
+                                    </div>
+
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                                        <input type="text" class="form-control border-start-0" id="address-search-box" placeholder="Tìm Tỉnh/Thành...">
+                                    </div>
+                                </div>
+
+                                <div id="address-list-area" class="list-group list-group-flush" style="max-height: 250px; overflow-y: auto;">
+                                    </div>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="address" id="address-hidden-input">
+                        <div class="error-msg text-danger mt-1 small" id="err-address" style="display:none;">Vui lòng chọn địa chỉ.</div>
                     </div>
                 </form>
             </div>
