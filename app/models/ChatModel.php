@@ -245,7 +245,43 @@ public function loadConversations($user_id) {
 
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
+// Lấy danh sách các cuộc trò chuyện gần nhất (kèm tin nhắn cuối)
+    public function getLatestConversation($user_id) {
+        $sql = "
+            SELECT 
+                c.id_conversation,
+                c.last_message_at,
+                u.id_user AS partner_id,
+                u.hoten AS partner_name,
+                u.avatar AS partner_avatar,
+                -- Subquery lấy tin nhắn mới nhất để hiển thị preview
+                (
+                    SELECT content 
+                    FROM messages m 
+                    WHERE m.id_conversation = c.id_conversation 
+                    ORDER BY m.created_at DESC 
+                    LIMIT 1
+                ) AS last_content
+            FROM conversations c
+            -- Join để lấy các hội thoại của user hiện tại
+            JOIN conversation_users cu_me ON c.id_conversation = cu_me.id_conversation
+            -- Join tiếp để tìm người kia (partner) trong hội thoại đó
+            JOIN conversation_users cu_other ON c.id_conversation = cu_other.id_conversation
+            -- Join bảng users để lấy thông tin người kia
+            LEFT JOIN users u ON cu_other.id_user = u.id_user
+            WHERE cu_me.id_user = ? 
+            AND cu_other.id_user != ? -- Đảm bảo không lấy thông tin của chính mình
+            ORDER BY c.last_message_at DESC
+        ";
 
+        $stmt = $this->conn->prepare($sql);
+        // id_user là varchar nên dùng "ss" (bind 2 lần cho 2 dấu ?)
+        $stmt->bind_param("ss", $user_id, $user_id);
+        $stmt->execute();
+        
+        // Trả về mảng kết hợp (Associative Array)
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
 
 }
 ?>
